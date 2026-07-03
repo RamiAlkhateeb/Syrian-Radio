@@ -1,23 +1,17 @@
 namespace AdminApp.Models;
 
-public class BlogIndexEntry
+public class PostEntry
 {
-    public string Slug         { get; set; } = string.Empty;
-    public string TitleEn      { get; set; } = string.Empty;
-    public string TitleDe      { get; set; } = string.Empty;
-    public string TitleAr      { get; set; } = string.Empty;
-    public string SummaryEn    { get; set; } = string.Empty;
-    public string SummaryDe    { get; set; } = string.Empty;
-    public string SummaryAr    { get; set; } = string.Empty;
-    public string? CoverImageUrl { get; set; }
-    public string? SubstackUrl   { get; set; }
-    public DateTime Date       { get; set; } = DateTime.Now;
-    public bool IsPublished    { get; set; }
+    public string TitleAr    { get; set; } = string.Empty;
+    public string SummaryAr  { get; set; } = string.Empty;
+    public string LinkedInUrl { get; set; } = string.Empty;
+    public string Date       { get; set; } = DateTime.Now.ToString("yyyy-MM-dd");
 }
 
-public class BlogPost : BlogIndexEntry
+public class GuideEntry
 {
-    public string BodyEn { get; set; } = string.Empty;
-    public string BodyDe { get; set; } = string.Empty;
-    public string BodyAr { get; set; } = string.Empty;
+    public string TitleAr    { get; set; } = string.Empty;
+    public string SummaryAr  { get; set; } = string.Empty;
+    public string PayhipUrl  { get; set; } = string.Empty;
+    public string PriceLabel { get; set; } = string.Empty;
 }

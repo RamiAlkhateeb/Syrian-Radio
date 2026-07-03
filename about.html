@@ -1,50 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About | Rami Alkhateeb</title>
+    <title>عن رامي الخطيب | رامي الخطيب</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="css/site.css">
 </head>
-<body class="lang-en" dir="ltr">
+<body>
 
     <header>
         <nav>
             <div class="logo">
-                <a href="index.html" style="text-decoration:none; color:inherit;">Rami Alkhateeb</a>
+                <a href="index.html">رامي الخطيب</a>
             </div>
             <div class="nav-controls">
                 <div class="nav-links">
-                    <a href="guides.html">
-                        <span class="lang-en-content">Guides</span>
-                        <span class="lang-de-content">Anleitungen</span>
-                        <span class="lang-ar-content">الأدلة</span>
-                    </a>
-                    <a href="blog.html">
-                        <span class="lang-en-content">Blog</span>
-                        <span class="lang-de-content">Blog</span>
-                        <span class="lang-ar-content">المدونة</span>
-                    </a>
-                    <a href="about.html">
-                        <span class="lang-en-content">About</span>
-                        <span class="lang-de-content">Über mich</span>
-                        <span class="lang-ar-content">عن</span>
-                    </a>
+                    <a href="index.html#guides">الأدلة</a>
+                    <a href="index.html#posts">المقالات</a>
+                    <a href="about.html">عن</a>
                 </div>
-                <div class="lang-dropdown">
-                    <button class="icon-btn" id="lang-dropdown-btn">
-                        <i class="fa-solid fa-globe"></i>
-                        <span id="current-lang-label">EN</span>
-                        <i class="fa-solid fa-chevron-down" style="font-size:0.8rem;"></i>
-                    </button>
-                    <div class="dropdown-menu" id="lang-dropdown-menu">
-                        <button type="button" data-lang="en">🇺🇸 English (EN)</button>
-                        <button type="button" data-lang="de">🇩🇪 Deutsch (DE)</button>
-                        <button type="button" data-lang="ar">🇸🇦 العربية (AR)</button>
-                    </div>
-                </div>
-                <button id="theme-toggle" class="icon-btn" aria-label="Toggle Dark Mode">
+                <a href="https://rami13kh.substack.com/" target="_blank" class="btn-substack">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M22.539 8.242H1.46V5.406h21.078v2.836zM1.46 10.812V24L12 18.11 22.54 24V10.812H1.46zM22.54 0H1.46v2.836h21.078V0z"/>
+                    </svg>
+                    Substack
+                </a>
+                <button id="theme-toggle" class="icon-btn" aria-label="تبديل الوضع الليلي">
                     <i class="fas fa-moon"></i>
                 </button>
             </div>
@@ -55,17 +37,11 @@
 
         <div style="display:flex; align-items:center; gap:30px; margin-bottom:50px; flex-wrap:wrap;">
             <img src="https://profile-images.xing.com/images/ef1ab292604cf041a50f4bff0e5ed3ed-2/rami-alkhateeb.256x256.jpg"
-                 alt="Rami Alkhateeb"
+                 alt="رامي الخطيب"
                  style="width:110px; height:110px; border-radius:50%; object-fit:cover; border:3px solid var(--primary-color); flex-shrink:0;">
             <div>
-                <h1 style="margin:0 0 8px; font-size:2rem; font-weight:800;">Rami Alkhateeb</h1>
-                <div class="lang-en-content" style="color:var(--text-muted); font-size:1.05rem;">
-                    .NET Engineer · Syria → UAE → Germany · Building second income through developer education
-                </div>
-                <div class="lang-de-content" style="color:var(--text-muted); font-size:1.05rem;">
-                    .NET-Entwickler · Syrien → VAE → Deutschland · Aufbau eines zweiten Einkommens durch Entwickler-Bildungsinhalte
-                </div>
-                <div class="lang-ar-content" style="color:var(--text-muted); font-size:1.05rem;">
+                <h1 style="margin:0 0 8px; font-size:2rem; font-weight:800;">رامي الخطيب</h1>
+                <div style="color:var(--text-muted); font-size:1.05rem;">
                     مطور .NET · سوريا ← الإمارات ← ألمانيا · أبني دخلاً ثانياً من خلال تعليم المطورين
                 </div>
             </div>
@@ -73,23 +49,9 @@
 
         <!-- BIO -->
         <section style="margin-bottom:50px;">
-            <h2 class="section-heading">
-                <span class="lang-en-content">Background</span>
-                <span class="lang-de-content">Hintergrund</span>
-                <span class="lang-ar-content">الخلفية</span>
-            </h2>
+            <h2 class="section-heading"><span>الخلفية</span></h2>
             <div class="saas-card" style="margin-top:20px;">
-                <div class="lang-en-content" style="color:var(--text-muted); line-height:1.8;">
-                    <p>Software engineer with 6+ years of experience across three different tech markets. Graduated in 2019, worked in Syria until 2022, then moved to the UAE, and relocated to Germany in 2025.</p>
-                    <p>Alongside my engineering career, I completed a postgraduate program in Decision Support Systems covering economics, accounting, business processes, supply chain management, and data analysis — giving me an unusual mix of technical and business thinking that I bring to my writing.</p>
-                    <p>I'm building practical guides for developers who are where I was: skilled, ambitious, and navigating a job market that wasn't built for them.</p>
-                </div>
-                <div class="lang-de-content" style="color:var(--text-muted); line-height:1.8;">
-                    <p>Softwareentwickler mit über 6 Jahren Erfahrung in drei verschiedenen Tech-Märkten. Abschluss 2019, danach Arbeit in Syrien bis 2022, Wechsel in die VAE und Umzug nach Deutschland 2025.</p>
-                    <p>Parallel zu meiner Karriere habe ich ein Aufbauprogramm in Entscheidungsunterstützungssystemen absolviert – mit Schwerpunkten in Wirtschaft, Buchhaltung, Geschäftsprozessen und Datenanalyse.</p>
-                    <p>Ich schreibe für Entwickler, die sich in einem Arbeitsmarkt beweisen wollen, der nicht für sie gemacht wurde.</p>
-                </div>
-                <div class="lang-ar-content" style="color:var(--text-muted); line-height:1.8;">
+                <div style="color:var(--text-muted); line-height:1.8;">
                     <p>مهندس برمجيات بخبرة تزيد عن 6 سنوات في ثلاثة أسواق تقنية مختلفة. تخرجت عام 2019، وعملت في سوريا حتى 2022، ثم انتقلت إلى الإمارات، ومنها إلى ألمانيا عام 2025.</p>
                     <p>إلى جانب مسيرتي الهندسية، أتممت برنامجاً في نظم دعم القرار يشمل الاقتصاد والمحاسبة وإدارة سلاسل التوريد وتحليل البيانات — مما يمنحني مزيجاً فريداً من التفكير التقني والتجاري.</p>
                     <p>أكتب لمطورين يشاركونني نفس التجربة: أكفياء وطموحون، ويسعون للنجاح في سوق عمل لم يُبنَ لهم.</p>
@@ -99,11 +61,7 @@
 
         <!-- EXPERIENCE -->
         <section style="margin-bottom:50px;">
-            <h2 class="section-heading">
-                <span class="lang-en-content">Experience</span>
-                <span class="lang-de-content">Erfahrung</span>
-                <span class="lang-ar-content">الخبرة</span>
-            </h2>
+            <h2 class="section-heading"><span>الخبرة</span></h2>
             <div style="margin-top:20px; display:flex; flex-direction:column; gap:16px;">
 
                 <div class="saas-card">
@@ -114,9 +72,7 @@
                         </div>
                         <span style="color:var(--text-muted); font-size:0.88rem;">2025 – Present</span>
                     </div>
-                    <div class="lang-en-content" style="color:var(--text-muted); font-size:0.95rem;">Working in the German tech market. Building expertise in European enterprise software environments.</div>
-                    <div class="lang-de-content" style="color:var(--text-muted); font-size:0.95rem;">Tätigkeit im deutschen Tech-Markt. Aufbau von Expertise in europäischen Unternehmensumgebungen.</div>
-                    <div class="lang-ar-content" style="color:var(--text-muted); font-size:0.95rem;">العمل في سوق التقنية الألماني وبناء خبرة في بيئات البرمجيات المؤسسية الأوروبية.</div>
+                    <div style="color:var(--text-muted); font-size:0.95rem;">العمل في سوق التقنية الألماني وبناء خبرة في بيئات البرمجيات المؤسسية الأوروبية.</div>
                 </div>
 
                 <div class="saas-card">
@@ -127,9 +83,7 @@
                         </div>
                         <span style="color:var(--text-muted); font-size:0.88rem;">2022 – 2025</span>
                     </div>
-                    <div class="lang-en-content" style="color:var(--text-muted); font-size:0.95rem;">.NET development in the Gulf tech market. Navigated visa processes, cross-cultural teams, and enterprise-scale systems.</div>
-                    <div class="lang-de-content" style="color:var(--text-muted); font-size:0.95rem;">.NET-Entwicklung im Golf-Tech-Markt. Visaprozesse, internationale Teams und Enterprise-Systeme.</div>
-                    <div class="lang-ar-content" style="color:var(--text-muted); font-size:0.95rem;">تطوير .NET في سوق الخليج التقني مع إدارة إجراءات التأشيرة والفرق متعددة الجنسيات والأنظمة المؤسسية.</div>
+                    <div style="color:var(--text-muted); font-size:0.95rem;">تطوير .NET في سوق الخليج التقني مع إدارة إجراءات التأشيرة والفرق متعددة الجنسيات والأنظمة المؤسسية.</div>
                 </div>
 
                 <div class="saas-card">
@@ -140,9 +94,7 @@
                         </div>
                         <span style="color:var(--text-muted); font-size:0.88rem;">2019 – 2022</span>
                     </div>
-                    <div class="lang-en-content" style="color:var(--text-muted); font-size:0.95rem;">Started career post-graduation. Built foundational skills in .NET, databases, and software architecture.</div>
-                    <div class="lang-de-content" style="color:var(--text-muted); font-size:0.95rem;">Karrierestart nach dem Studium. Grundlegende Kenntnisse in .NET, Datenbanken und Softwarearchitektur.</div>
-                    <div class="lang-ar-content" style="color:var(--text-muted); font-size:0.95rem;">بداية المسيرة المهنية بعد التخرج وبناء المهارات الأساسية في .NET وقواعد البيانات وهندسة البرمجيات.</div>
+                    <div style="color:var(--text-muted); font-size:0.95rem;">بداية المسيرة المهنية بعد التخرج وبناء المهارات الأساسية في .NET وقواعد البيانات وهندسة البرمجيات.</div>
                 </div>
 
             </div>
@@ -150,11 +102,7 @@
 
         <!-- SKILLS -->
         <section style="margin-bottom:50px;">
-            <h2 class="section-heading">
-                <span class="lang-en-content">Skills & Tools</span>
-                <span class="lang-de-content">Kenntnisse & Tools</span>
-                <span class="lang-ar-content">المهارات والأدوات</span>
-            </h2>
+            <h2 class="section-heading"><span>المهارات والأدوات</span></h2>
             <div class="saas-card" style="margin-top:20px; display:flex; flex-wrap:wrap; gap:10px;">
                 <span class="skill-tag">.NET / C#</span>
                 <span class="skill-tag">ASP.NET Core</span>
@@ -173,17 +121,12 @@
     </main>
 
     <footer class="site-footer">
-        <p>
-            <span class="lang-en-content">English content on</span>
-            <span class="lang-de-content">Englische Inhalte auf</span>
-            <span class="lang-ar-content">المحتوى الإنجليزي على</span>
-            <a href="https://rami13kh.substack.com/" target="_blank">Substack ↗</a>
-        </p>
+        <p>المحتوى الإنجليزي على <a href="https://rami13kh.substack.com/" target="_blank">Substack ↗</a></p>
         <p class="footer-links">
             <a href="https://linkedin.com/in/rami13alkhateeb" target="_blank">LinkedIn</a>
             <a href="https://github.com/ramialkhateeb" target="_blank">GitHub</a>
         </p>
-        <p class="footer-copy">&copy; 2026 Rami Alkhateeb</p>
+        <p class="footer-copy">&copy; 2026 رامي الخطيب</p>
     </footer>
 
     <script src="js/site.js"></script>

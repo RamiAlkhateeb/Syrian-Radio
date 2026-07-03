@@ -1,0 +1,34 @@
+name: Deploy Portfolio Site
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Prepare deployment artifacts
+      run: |
+        set -e
+        mkdir -p gh-pages-out
+        cp index.html gh-pages-out/
+        cp about.html gh-pages-out/
+        cp -R css gh-pages-out/
+        cp -R js gh-pages-out/
+        echo "✅ Artifacts staged:"
+        ls gh-pages-out/
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: gh-pages-out
+        publish_branch: gh-pages

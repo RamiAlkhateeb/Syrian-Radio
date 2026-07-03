@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
 using Octokit;
-using System.Net.Http; 
 
 namespace AdminApp.Services;
 
@@ -8,12 +6,12 @@ public class GitHubService
 {
     private GitHubClient? _client;
     private string _owner = string.Empty;
-    private string _repo = string.Empty;
+    private string _repo  = string.Empty;
 
     public void Initialize(string token, string owner, string repo)
     {
         _owner = owner;
-        _repo = repo;
+        _repo  = repo;
         _client = new GitHubClient(new ProductHeaderValue("PortfolioAdminSuite"))
         {
             Credentials = new Credentials(token)
@@ -24,42 +22,57 @@ public class GitHubService
 
     public async Task<string> GetFileRawAsync(string path)
     {
-        if (!IsConfigured) throw new Exception("GitHub client is not initialized.");
+        if (!IsConfigured) throw new Exception("GitHub client not initialized.");
         var contents = await _client!.Repository.Content.GetAllContents(_owner, _repo, path);
-        return contents.First().Content;
+        // RepositoryContent.Content is already decoded UTF-8 text in Octokit 14.x
+        return contents.First().Content ?? string.Empty;
     }
 
     public async Task SaveFileContentAsync(string path, string content, string commitMessage)
     {
-        if (!IsConfigured) throw new Exception("GitHub client is not initialized.");
-
+        if (!IsConfigured) throw new Exception("GitHub client not initialized.");
+        // Pass plain text — Octokit 14.x automatically base64-encodes before sending to GitHub API.
+        // Pre-encoding here would cause double-encoding: GitHub stores base64 text instead of HTML.
         try
         {
-            var existingFile = await _client!.Repository.Content.GetAllContents(_owner, _repo, path);
-            var sha = existingFile.First().Sha;
-            await _client.Repository.Content.UpdateFile(_owner, _repo, path, new UpdateFileRequest(commitMessage, content, sha));
+            var existing = await _client!.Repository.Content.GetAllContents(_owner, _repo, path);
+            var sha = existing.First().Sha;
+            await _client.Repository.Content.UpdateFile(
+                _owner, _repo, path,
+                new UpdateFileRequest(commitMessage, content, sha));
         }
         catch (NotFoundException)
         {
-            await _client!.Repository.Content.CreateFile(_owner, _repo, path, new CreateFileRequest(commitMessage, content));
+            await _client!.Repository.Content.CreateFile(
+                _owner, _repo, path,
+                new CreateFileRequest(commitMessage, content));
         }
     }
 
-    public async Task TriggerWorkflowCompilerAsync()
-{
-    if (!IsConfigured || _client == null) return;
+    public async Task InjectBetweenMarkersAsync(
+        string filePath,
+        string startMarker,
+        string endMarker,
+        string newBlock,
+        string commitMessage)
+    {
+        if (!IsConfigured) throw new Exception("GitHub client not initialized.");
 
-    var uri = new Uri($"https://api.github.com/repos/{_owner}/{_repo}/dispatches");
+        string html = await GetFileRawAsync(filePath);
 
-    var payload = new { event_type = "trigger-compiler" };
-    var json = JsonSerializer.Serialize(payload);
-    var httpContent = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        int startIdx = html.IndexOf(startMarker, StringComparison.Ordinal);
+        int endIdx   = html.IndexOf(endMarker,   StringComparison.Ordinal);
 
-    using var http = new HttpClient();
-    http.DefaultRequestHeaders.Add("Authorization", $"Bearer {_client.Credentials.Password}");
-    http.DefaultRequestHeaders.Add("User-Agent", "PortfolioAdminSuite");
-    http.DefaultRequestHeaders.Add("Accept", "application/vnd.github+json");
+        if (startIdx < 0 || endIdx < 0)
+            throw new Exception($"Markers not found in {filePath}. Expected: {startMarker} and {endMarker}");
 
-    await http.PostAsync(uri, httpContent);
-}
+        int contentStart = startIdx + startMarker.Length;
+        string before    = html[..contentStart];
+        string after     = html[endIdx..];
+
+        // Prepend new block so newest content appears first
+        string updated = before + "\n" + newBlock + "\n" + after;
+
+        await SaveFileContentAsync(filePath, updated, commitMessage);
+    }
 }

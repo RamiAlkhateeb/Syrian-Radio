@@ -10,7 +10,5 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddSingleton<LocalStorageService>();
 builder.Services.AddSingleton<GitHubService>();
-builder.Services.AddScoped<TranslationService>();
-builder.Services.AddScoped<SubstackService>();
 
 await builder.Build().RunAsync();

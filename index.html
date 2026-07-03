@@ -1,52 +1,31 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 
-<!DOCTYPE html>
-<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rami Alkhateeb | Engineering Guides</title>
+    <title>رامي الخطيب | مهندس برمجيات</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="css/site.css">
 </head>
-<body class="lang-en" dir="ltr">
 
-    <!-- NAV -->
+<body>
+
     <header>
         <nav>
             <div class="logo">
-                <a href="index.html" style="text-decoration:none; color:inherit;">Rami Alkhateeb</a>
+                <a href="index.html">رامي الخطيب</a>
             </div>
             <div class="nav-controls">
                 <div class="nav-links">
-                    <a href="guides.html">
-                        <span class="lang-en-content">Guides</span>
-                        <span class="lang-de-content">Anleitungen</span>
-                        <span class="lang-ar-content">الأدلة</span>
-                    </a>
-                    <a href="blog.html">
-                        <span class="lang-en-content">Blog</span>
-                        <span class="lang-de-content">Blog</span>
-                        <span class="lang-ar-content">المدونة</span>
-                    </a>
-                    <a href="about.html">
-                        <span class="lang-en-content">About</span>
-                        <span class="lang-de-content">Über mich</span>
-                        <span class="lang-ar-content">عن</span>
-                    </a>
+                    <a href="#guides">الأدلة</a>
+                    <a href="#posts">المقالات</a>
+                    <a href="about.html">عن</a>
                 </div>
-                <div class="lang-dropdown">
-                    <button class="icon-btn" id="lang-dropdown-btn">
-                        <i class="fa-solid fa-globe"></i>
-                        <span id="current-lang-label">EN</span>
-                        <i class="fa-solid fa-chevron-down" style="font-size:0.8rem;"></i>
-                    </button>
-                    <div class="dropdown-menu" id="lang-dropdown-menu">
-                        <button type="button" data-lang="en">🇺🇸 English (EN)</button>
-                        <button type="button" data-lang="de">🇩🇪 Deutsch (DE)</button>
-                        <button type="button" data-lang="ar">🇸🇦 العربية (AR)</button>
-                    </div>
-                </div>
-                <button id="theme-toggle" class="icon-btn" aria-label="Toggle Dark Mode">
+                <a href="https://rami13kh.substack.com/" target="_blank" class="btn-substack">
+                    <i class="fa-solid fa-envelope"></i> Substack
+                </a>
+                <button id="theme-toggle" class="icon-btn" aria-label="تبديل الوضع الليلي">
                     <i class="fas fa-moon"></i>
                 </button>
             </div>
@@ -55,131 +34,78 @@
 
     <main class="container">
 
-        <!-- HERO -->
-        <section class="hero-section fade-up">
-            <div class="lang-en-content">
-                <h1>Helping developers <span class="text-gradient">ace interviews</span> & build with AI.</h1>
-                <p class="hero-sub">Practical guides and articles for engineers targeting the European tech market. Written by someone who made the journey.</p>
-                <div class="hero-ctas">
-                    <a href="guides.html" class="btn-primary">Browse Guides <i class="fa-solid fa-arrow-right"></i></a>
-                    <a href="blog.html" class="btn-secondary">Read the Blog</a>
-                </div>
-            </div>
-            <div class="lang-de-content">
-                <h1>Praxiswissen für Entwickler: <span class="text-gradient">Interviews meistern</span> & mit KI bauen.</h1>
-                <p class="hero-sub">Praktische Guides und Artikel für Entwickler, die den europäischen Tech-Markt anvisieren. Geschrieben von jemandem, der diesen Weg gegangen ist.</p>
-                <div class="hero-ctas">
-                    <a href="guides.html" class="btn-primary">Guides ansehen <i class="fa-solid fa-arrow-right"></i></a>
-                    <a href="blog.html" class="btn-secondary">Zum Blog</a>
-                </div>
-            </div>
-            <div class="lang-ar-content">
-                <h1>محتوى عملي للمطورين: <span class="text-gradient">اجتز المقابلات</span> وابنِ بالذكاء الاصطناعي.</h1>
-                <p class="hero-sub">أدلة ومقالات عملية للمطورين الراغبين في دخول سوق التقنية الأوروبي. كتبها شخص عاش هذه التجربة بنفسه.</p>
-                <div class="hero-ctas" style="flex-direction:row-reverse;">
-                    <a href="guides.html" class="btn-primary"><i class="fa-solid fa-arrow-left"></i> تصفح الأدلة</a>
-                    <a href="blog.html" class="btn-secondary">اقرأ المدونة</a>
-                </div>
-            </div>
+        <section class="hero">
+            <h1>رامي الخطيب</h1>
+            <p>مهندس برمجيات ومطور حلول تقنية. أشارك هنا أدلة ومقالات حول الذكاء الاصطناعي وبناء التطبيقات.</p>
         </section>
 
-        <!-- GUIDES PREVIEW -->
-        <section class="preview-section">
-            <div class="preview-header">
-                <h2 class="section-heading">
-                    <span class="lang-en-content">Featured Guides</span>
-                    <span class="lang-de-content">Meine Guides</span>
-                    <span class="lang-ar-content">الأدلة المميزة</span>
-                </h2>
-                <a href="guides.html" class="preview-see-all">
-                    <span class="lang-en-content">View all →</span>
-                    <span class="lang-de-content">Alle ansehen →</span>
-                    <span class="lang-ar-content">← عرض الكل</span>
+        <!-- GUIDES_START -->
+        <section id="guides">
+            <h2 class="section-heading">الأدلة والكتب الرقمية</h2>
+
+            <a href="https://payhip.com/" target="_blank" class="guide-card">
+                <div class="guide-card-title">دليل كتابة الـ Prompts لـ Claude (النسخة الأساسية)</div>
+                <div class="guide-card-summary">تعلم الأساسيات لبناء أوامر فعالة للذكاء الاصطناعي لتسريع عملك كمطور والحصول على نتائج دقيقة من المحاولة الأولى.</div>
+                <div class="guide-price">مجانًا</div>
+            </a>
+
+            <a href="https://payhip.com/" target="_blank" class="guide-card">
+                <div class="guide-card-title">دليل كتابة الـ Prompts لـ Claude (النسخة المتقدمة)</div>
+                <div class="guide-card-summary">استراتيجيات تقنية متعمقة لسير عمل الذكاء الاصطناعي، وإدارة القيود، وتحسين الأكواد البرمجية للمطورين المحترفين.</div>
+                <div class="guide-price">19$</div>
+            </a>
+        </section>
+        <!-- GUIDES_END -->
+
+        <!-- POSTS_START -->
+
+                <a href="https://www.linkedin.com/posts/rami13alkhateeb_%D9%85-english-version-in-the-comments-%D8%A8%D9%88%D8%B3%D8%AA-%D8%B1%D9%82%D9%85-share-7474898665627631616-0S30/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAB806s4BoSWn0JaeGaR7tebMSfsZvzrRRaI" target="_blank" class="post-card">
+                    <div class="post-card-pattern">
+                        <i class="fab fa-linkedin"></i>
+                    </div>
+                    <div class="post-card-body">
+                        <div class="post-card-title">ما الفرق بين async/await وTask.Run؟</div>
+                        <div class="post-card-summary">تخيل مطعم فيه طباخين تنين:
+
+🧑‍🍳 الطباخ الأول (async/await)
+🧑‍🍳 الطباخ التاني (Task.Run)</div>
+                    </div>
+                    <div class="post-card-meta">
+                        <span class="post-card-date">2026-06-27</span>
+                        <span class="post-card-arrow">LinkedIn ←</span>
+                    </div>
                 </a>
-            </div>
-            <div class="guides-grid" id="guides-preview-container">
-                <div class="preview-loading">
-                    <span class="lang-en-content">Loading guides...</span>
-                    <span class="lang-de-content">Guides werden geladen...</span>
-                    <span class="lang-ar-content">جارٍ تحميل الأدلة...</span>
-                </div>
-            </div>
-        </section>
+<!-- POSTS_END -->
 
-        <!-- BLOG PREVIEW -->
-        <section class="preview-section">
-            <div class="preview-header">
-                <h2 class="section-heading">
-                    <span class="lang-en-content">Latest Articles</span>
-                    <span class="lang-de-content">Neueste Artikel</span>
-                    <span class="lang-ar-content">أحدث المقالات</span>
-                </h2>
-                <a href="blog.html" class="preview-see-all">
-                    <span class="lang-en-content">All articles →</span>
-                    <span class="lang-de-content">Alle Artikel →</span>
-                    <span class="lang-ar-content">← جميع المقالات</span>
-                </a>
-            </div>
-            <div class="blog-list" id="blog-preview-container">
-                <div class="preview-loading">
-                    <span class="lang-en-content">Loading articles...</span>
-                    <span class="lang-de-content">Artikel werden geladen...</span>
-                    <span class="lang-ar-content">جارٍ تحميل المقالات...</span>
-                </div>
-            </div>
-        </section>
 
-        <!-- ABOUT STRIP -->
-        <section class="about-strip">
-            <img
-                src="https://profile-images.xing.com/images/ef1ab292604cf041a50f4bff0e5ed3ed-2/rami-alkhateeb.256x256.jpg"
-                alt="Rami Alkhateeb"
-                class="about-strip-photo">
-            <div class="about-strip-text">
-                <div class="lang-en-content">
-                    <strong>Rami Alkhateeb</strong> — .NET engineer who has worked across Syria, UAE, and Germany.
-                    I write practical guides for developers navigating the European job market.
-                </div>
-                <div class="lang-de-content">
-                    <strong>Rami Alkhateeb</strong> — .NET-Entwickler mit Erfahrung in Syrien, den VAE und Deutschland.
-                    Ich schreibe praxisnahe Guides für Entwickler auf dem europäischen Arbeitsmarkt.
-                </div>
-                <div class="lang-ar-content">
-                    <strong>رامي الخطيب</strong> — مطور .NET عمل في سوريا والإمارات وألمانيا.
-                    أكتب أدلة عملية للمطورين الراغبين في الانتقال إلى سوق العمل الأوروبي.
-                </div>
-                <div class="about-strip-links">
-                    <a href="https://linkedin.com/in/rami13alkhateeb" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-                    <a href="https://github.com/ramialkhateeb" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
-                    <a href="https://rami13kh.substack.com/" target="_blank" aria-label="Substack">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M22.539 8.242H1.46V5.406h21.078v2.836zM1.46 10.812V24L12 18.11 22.54 24V10.812H1.46zM22.54 0H1.46v2.836h21.078V0z"/></svg>
-                    </a>
-                    <a href="about.html" class="about-strip-more">
-                        <span class="lang-en-content">Full bio →</span>
-                        <span class="lang-de-content">Vollständig →</span>
-                        <span class="lang-ar-content">← السيرة الكاملة</span>
-                    </a>
-                </div>
+        <section id="about" style="margin-top: 80px; margin-bottom: 40px;">
+            <h2 class="section-heading">نبذة عني</h2>
+            <div class="saas-card" style="padding: 40px;">
+                <p style="font-size: 1.1rem; color: var(--text-muted); margin-bottom: 20px;">
+                    أنا مطور برمجيات أعمل وأعيش في ألمانيا. أركز في عملي على هندسة البرمجيات باستخدام (.NET) ومساعدة
+                    زملائي المطورين على تعزيز إنتاجيتهم عبر أدوات الذكاء الاصطناعي وتطوير مساراتهم المهنية.
+                </p>
+                <a href="about.html" style="color: var(--accent); font-weight: 600; text-decoration: none;">قراءة السيرة
+                    الكاملة &larr;</a>
             </div>
         </section>
 
     </main>
 
-    <!-- FOOTER -->
     <footer class="site-footer">
-        <p>
-            <span class="lang-en-content">English content on</span>
-            <span class="lang-de-content">Englische Inhalte auf</span>
-            <span class="lang-ar-content">المحتوى الإنجليزي على</span>
-            <a href="https://rami13kh.substack.com/" target="_blank">Substack ↗</a>
-        </p>
-        <p class="footer-links">
-            <a href="https://linkedin.com/in/rami13alkhateeb" target="_blank">LinkedIn</a>
-            <a href="https://github.com/ramialkhateeb" target="_blank">GitHub</a>
-        </p>
-        <p class="footer-copy">&copy; 2026 Rami Alkhateeb</p>
+        <p>المحتوى الإنجليزي متاح على <a href="https://rami13kh.substack.com/" target="_blank">Substack &nearr;</a></p>
+        <div style="margin: 20px 0; display: flex; justify-content: center; gap: 20px;">
+            <a href="https://linkedin.com/in/rami13alkhateeb" target="_blank" aria-label="LinkedIn">
+                <i class="fab fa-linkedin" style="font-size: 1.5rem;"></i>
+            </a>
+            <a href="https://github.com/ramialkhateeb" target="_blank" aria-label="GitHub">
+                <i class="fab fa-github" style="font-size: 1.5rem;"></i>
+            </a>
+        </div>
+        <p>&copy; 2026 رامي الخطيب. جميع الحقوق محفوظة.</p>
     </footer>
 
     <script src="js/site.js"></script>
 </body>
+
 </html>
