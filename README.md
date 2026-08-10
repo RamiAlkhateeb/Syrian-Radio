@@ -1,30 +1,39 @@
-# Rami – Backend Engineer & Technical Lead
+# Ninar FM Player
 
-A clean, responsive portfolio to showcase my experience as a Backend Engineer and Technical Lead, focusing on .NET, Azure, and modern web architectures.
+A Blazor WebAssembly single-page player for Ninar FM's live stream.
 
-## 🚀 Live Demo
+## Run locally
 
-- Portfolio: https://ramialkhateeb.github.io/Portfolio/
-- Tech Stack: HTML, CSS, JavaScript
+Prerequisite: install the .NET 9 SDK.
 
-## 👋 About Me
+```powershell
+dotnet restore
+dotnet run
+```
 
-I am a Backend Engineer with 6+ years of experience building scalable web applications across logistics, education, HRM, and telecommunications.  
-I enjoy designing clean architectures, applying SOLID principles, and mentoring teams while staying hands‑on with code.
+Open the `https://localhost:<port>` address printed by the command. Stop the server with `Ctrl+C`.
 
-## 🧩 Main Sections
+## Project structure
 
-- **Hero** – Short introduction, role, and primary call‑to‑action  
-- **About** – Summary of experience, interests, and quick social links  
-- **Experience** – Highlighted roles at Carma, Abu Dhabi Ports, and Tech Unicorn  
-- **Projects** – Featured work with images, summaries, and GitHub links  
-- **Skills** – Categorized overview of languages, frameworks, cloud, and tools  
-- **Contact** – Simple way to get in touch for roles, projects, or collaborations  
+- `Pages/Index.razor`: home page and stream URL configuration.
+- `Shared/RadioPlayer.razor`: player UI and Blazor JavaScript interop.
+- `wwwroot/js/radioPlayer.js`: native audio element control and events.
+- `wwwroot/css/app.css`: visual styling.
 
-## 💼 Experience Highlight
+## Stream source
 
-- **Carma – Backend Engineer**  
-  Modernized prosecution systems, integrated with Dubai Police, and improved scalability and security.
+The radio origin is online and sends `Access-Control-Allow-Origin: *`, but it is HTTP-only. It works when the player is served locally over HTTP. An HTTPS site must use an HTTPS proxy because browsers block HTTP audio as mixed content.
 
-- **Abu Dhabi Ports – Backend Engineer**  
-  Worked on ATLP services, optimized SQL performance, and improved microservice
+This project includes a locked-down Cloudflare Worker in `worker/`; it relays only the Ninar FM stream and supports streaming response bodies and range requests. Do not use a public generic proxy for production.
+
+1. Install Node.js, then run these commands from the project root:
+   ```powershell
+   cd worker
+   npx wrangler login
+   npx wrangler deploy
+   ```
+2. Copy the emitted `https://...workers.dev` URL into `wwwroot/config.js`:
+   ```js
+   globalThis.NINAR_FM_PROXY_URL = "https://your-worker.workers.dev/";
+   ```
+3. Rebuild and deploy the player. Keep `NINAR_FM_PROXY_URL` blank for local HTTP development.

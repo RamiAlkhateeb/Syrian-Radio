@@ -1,0 +1,135 @@
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<div class="player-card">
+    <div class="station-logo">
+        <img src="img/ninar-logo.png" alt="@StationName logo" onerror="this.style.display='none'" />
+    </div>
+
+    <h1 class="station-name">@StationName</h1>
+    <p class="station-tagline">@Tagline</p>
+
+    <div class="status-row">
+        <span class="status-dot status-@statusClass"></span>
+        <span class="status-text">@statusText</span>
+    </div>
+
+    <audio id="@audioElementId" preload="none"></audio>
+
+    <div class="controls-row">
+        <button class="play-btn" @onclick="TogglePlay" aria-label="@(isPlaying ? "Pause" : "Play")">
+            @if (isPlaying)
+            {
+                <span>&#10074;&#10074;</span>
+            }
+            else
+            {
+                <span>&#9654;</span>
+            }
+        </button>
+
+        <div class="volume-row">
+            <span>&#128266;</span>
+            <input type="range" min="0" max="100" value="@volume"
+                   @oninput="OnVolumeChanged" />
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string StationName { get; set; } = "Ninar FM";
+    [Parameter] public string Tagline { get; set; } = "Live from Syria";
+    [Parameter, EditorRequired] public string StreamUrl { get; set; } = "";
+
+    private readonly string audioElementId = "ninar-audio-" + Guid.NewGuid().ToString("N");
+    private IJSObjectReference? module;
+    private DotNetObjectReference<RadioPlayer>? dotNetRef;
+
+    private bool isPlaying;
+    private int volume = 80;
+    private string statusClass = "idle";
+    private string statusText = "Ready to play";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/radioPlayer.js");
+            dotNetRef = DotNetObjectReference.Create(this);
+            await module.InvokeVoidAsync("init", audioElementId, dotNetRef);
+            await module.InvokeVoidAsync("setVolume", volume / 100.0);
+        }
+    }
+
+    private async Task TogglePlay()
+    {
+        if (module is null) return;
+
+        if (isPlaying)
+        {
+            await module.InvokeVoidAsync("pause");
+            isPlaying = false;
+            SetStatus("paused", "Paused");
+        }
+        else
+        {
+            SetStatus("buffering", "Connecting...");
+            isPlaying = true;
+            await module.InvokeVoidAsync("play", StreamUrl);
+        }
+    }
+
+    private async Task OnVolumeChanged(ChangeEventArgs e)
+    {
+        if (module is null) return;
+        if (int.TryParse(e.Value?.ToString(), out var v))
+        {
+            volume = v;
+            await module.InvokeVoidAsync("setVolume", volume / 100.0);
+        }
+    }
+
+    [JSInvokable]
+    public void OnStatusChanged(string status)
+    {
+        switch (status)
+        {
+            case "live":
+                isPlaying = true;
+                SetStatus("live", "Live now");
+                break;
+            case "buffering":
+                SetStatus("buffering", "Buffering...");
+                break;
+            case "paused":
+                isPlaying = false;
+                SetStatus("paused", "Paused");
+                break;
+            case "error":
+                isPlaying = false;
+                SetStatus("error", "Connection lost - tap play to retry");
+                break;
+        }
+        StateHasChanged();
+    }
+
+    private void SetStatus(string cls, string text)
+    {
+        statusClass = cls;
+        statusText = text;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (module is not null)
+        {
+            try
+            {
+                await module.InvokeVoidAsync("pause");
+                await module.DisposeAsync();
+            }
+            catch (JSDisconnectedException) { }
+        }
+        dotNetRef?.Dispose();
+    }
+}

@@ -1,0 +1,16 @@
+@page "/"
+
+<PageTitle>Ninar FM - Live</PageTitle>
+
+<div class="app-background">
+    <RadioPlayer StationName="Ninar FM"
+                 Tagline="Ninar FM - Live from Syria"
+                 StreamUrl="@streamUrl" />
+</div>
+
+@code {
+    // The origin permits CORS, but is HTTP-only. For HTTPS deployments, set
+    // NINAR_FM_PROXY_URL in wwwroot/config.js to the included Worker URL.
+    private readonly string streamUrl =
+        "http://ninarfm.grtvstream.com:8896/";
+}

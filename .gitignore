@@ -1,41 +1,4 @@
-## ---------------------------------------------------------------------
-## 1. .NET / C# Project Build Overrides (compiler & AdminApp)
-## ---------------------------------------------------------------------
-# Ignore compilation artifacts, obj configurations, and intermediate binaries
-**/bin/
-**/obj/
-
-# Avoid tracking auto-generated hot reload metadata files
-.vs/
-.vscode/
-*.user
-*.suo
-*.userosscache
-*.sln.docstates
-
-## ---------------------------------------------------------------------
-## 2. Web / Frontend Runtime & Environment Exclusions
-## ---------------------------------------------------------------------
-# Ignore local Node or bundler modules if you happen to run frontend utilities
-node_modules/
-.npm/
-
-# Ignore local browser logging or runtime memory dumps
-*.log
-.eslintcache
-
-## ---------------------------------------------------------------------
-## 3. Architecture Rules - TRACK DATA & LAYOUTS, IGNORE GENERATED OUTPUTS
-## ---------------------------------------------------------------------
-# Allow tracking of your Git database folder structures (DO NOT IGNORE THESE)
-!content/
-!content/blog/
-!content/blog/posts/
-!content/guides.json
-!templates/
-
-# Optional Security Guardrail:
-# If you ever save local raw secrets or API settings files in your app 
-# instead of browser localStorage, keep them out of GitHub:
-appsettings.Development.json
-*.secrets.json
+bin/
+obj/
+ninarfm-run.log
+ninarfm-run.error.log
