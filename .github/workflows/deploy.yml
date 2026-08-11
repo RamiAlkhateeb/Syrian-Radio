@@ -1,34 +1,31 @@
-name: Deploy Portfolio Site
+name: Deploy to Cloudflare Pages
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-
+      contents: read
+      deployments: write
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-    - name: Prepare deployment artifacts
-      run: |
-        set -e
-        mkdir -p gh-pages-out
-        cp index.html gh-pages-out/
-        cp about.html gh-pages-out/
-        cp -R css gh-pages-out/
-        cp -R js gh-pages-out/
-        echo "✅ Artifacts staged:"
-        ls gh-pages-out/
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
 
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v4
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: gh-pages-out
-        publish_branch: gh-pages
+      - name: Publish Blazor WASM app
+        run: dotnet publish NinarFmPlayer.csproj -c Release -o publish
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy publish/wwwroot --project-name=ninar-fm-player
