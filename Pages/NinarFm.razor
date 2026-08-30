@@ -1,0 +1,19 @@
+@page "/ninar-fm"
+
+<PageTitle>نينار FM - البث المباشر</PageTitle>
+
+<main class="station-page ninar-theme" lang="ar" dir="rtl">
+    <a class="back-link" href="/">كل المحطات ←</a>
+
+    <RadioPlayer StationName="Ninar FM"
+                 Tagline="نينار FM - البث المباشر من سوريا"
+                 LogoUrl="img/ninar-logo.png"
+                 StreamUrl="@streamUrl"
+                 UseNinarProxy="true" />
+</main>
+
+@code {
+    // The origin is HTTP-only. HTTPS deployments use the optional Worker URL
+    // configured in wwwroot/config.js.
+    private const string streamUrl = "http://ninarfm.grtvstream.com:8896/";
+}

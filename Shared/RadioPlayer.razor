@@ -3,7 +3,7 @@
 
 <div class="player-card">
     <div class="station-logo">
-        <img src="img/ninar-logo.png" alt="@StationName logo" onerror="this.style.display='none'" />
+        <img src="@LogoUrl" alt="شعار @StationName" />
     </div>
 
     <h1 class="station-name">@StationName</h1>
@@ -17,7 +17,7 @@
     <audio id="@audioElementId" preload="none"></audio>
 
     <div class="controls-row">
-        <button class="play-btn" @onclick="TogglePlay" aria-label="@(isPlaying ? "Pause" : "Play")">
+        <button class="play-btn" @onclick="TogglePlay" aria-label="@(isPlaying ? "إيقاف مؤقت" : "تشغيل")">
             @if (isPlaying)
             {
                 <span>&#10074;&#10074;</span>
@@ -38,8 +38,10 @@
 
 @code {
     [Parameter] public string StationName { get; set; } = "Ninar FM";
-    [Parameter] public string Tagline { get; set; } = "Live from Syria";
+    [Parameter] public string Tagline { get; set; } = "البث المباشر من سوريا";
+    [Parameter, EditorRequired] public string LogoUrl { get; set; } = "";
     [Parameter, EditorRequired] public string StreamUrl { get; set; } = "";
+    [Parameter] public bool UseNinarProxy { get; set; }
 
     private readonly string audioElementId = "ninar-audio-" + Guid.NewGuid().ToString("N");
     private IJSObjectReference? module;
@@ -48,7 +50,7 @@
     private bool isPlaying;
     private int volume = 80;
     private string statusClass = "idle";
-    private string statusText = "Ready to play";
+    private string statusText = "جاهز للتشغيل";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -69,13 +71,13 @@
         {
             await module.InvokeVoidAsync("pause");
             isPlaying = false;
-            SetStatus("paused", "Paused");
+            SetStatus("paused", "متوقف مؤقتاً");
         }
         else
         {
-            SetStatus("buffering", "Connecting...");
+            SetStatus("buffering", "جارٍ الاتصال...");
             isPlaying = true;
-            await module.InvokeVoidAsync("play", StreamUrl);
+            await module.InvokeVoidAsync("play", StreamUrl, UseNinarProxy);
         }
     }
 
@@ -96,18 +98,18 @@
         {
             case "live":
                 isPlaying = true;
-                SetStatus("live", "Live now");
+                SetStatus("live", "على الهواء الآن");
                 break;
             case "buffering":
-                SetStatus("buffering", "Buffering...");
+                SetStatus("buffering", "جارٍ تحميل البث...");
                 break;
             case "paused":
                 isPlaying = false;
-                SetStatus("paused", "Paused");
+                SetStatus("paused", "متوقف مؤقتاً");
                 break;
             case "error":
                 isPlaying = false;
-                SetStatus("error", "Connection lost - tap play to retry");
+                SetStatus("error", "انقطع الاتصال - اضغط تشغيل للمحاولة مجدداً");
                 break;
         }
         StateHasChanged();
@@ -125,7 +127,7 @@
         {
             try
             {
-                await module.InvokeVoidAsync("pause");
+                await module.InvokeVoidAsync("dispose");
                 await module.DisposeAsync();
             }
             catch (JSDisconnectedException) { }
