@@ -47,6 +47,7 @@ html, body {
     justify-content: center;
     max-width: 1120px;
     margin: 0 auto;
+    font-family: "Cairo", "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
 .ninar-theme {
