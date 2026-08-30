@@ -2,3 +2,6 @@ bin/
 obj/
 ninarfm-run.log
 ninarfm-run.error.log
+dotnet/
+output/
+dotnet-install.sh
