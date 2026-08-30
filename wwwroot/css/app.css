@@ -85,6 +85,18 @@ html, body {
     margin: 10px 0 0;
 }
 
+.about-link {
+    display: inline-block;
+    color: var(--text-dim);
+    font-size: .9rem;
+    font-weight: 600;
+    margin-top: 16px;
+    text-decoration: none;
+}
+
+.about-link:hover,
+.about-link:focus-visible { color: var(--text); }
+
 .station-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -133,10 +145,20 @@ html, body {
     background: linear-gradient(145deg, #fff, #e9e9e9);
 }
 
-.station-card-ninar .station-card-logo img {
-    padding: 12px;
-    border-radius: 12px;
-    background: white;
+.station-card-sham .station-card-logo {
+    background: #e0f2fe;
+}
+
+.station-card-ninar .station-card-logo img,
+.station-card-sham .station-card-logo img,
+.station-card-syria-tv .station-card-logo img {
+    width: 156px;
+    height: 156px;
+    max-width: 100%;
+    max-height: 100%;
+    padding: 0;
+    object-fit: contain;
+    border-radius: 20px;
 }
 
 .station-card-content {
@@ -183,6 +205,95 @@ html, body {
 
 .back-link:hover,
 .back-link:focus-visible { color: var(--text); }
+
+.about-page {
+    min-height: 100vh;
+    padding: 48px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    font-family: "Cairo", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+.about-card {
+    width: min(100%, 520px);
+    padding: 32px 28px;
+    text-align: center;
+    background: var(--card-bg);
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .35);
+}
+
+.about-logo {
+    width: 104px;
+    height: 104px;
+    object-fit: contain;
+    border-radius: 22px;
+}
+
+.about-card h1 { margin: 18px 0 8px; }
+.about-card > p { color: var(--text-dim); line-height: 1.8; margin: 0; }
+.about-card h2 { font-size: 1.2rem; margin: 30px 0 12px; }
+
+.team-member {
+    padding: 16px;
+    background: rgba(255, 255, 255, .05);
+    border-radius: 12px;
+}
+
+.team-member h3 { margin: 0; font-size: 1.05rem; }
+.team-member p { color: var(--text-dim); margin: 5px 0 0; }
+
+.ios-onboarding-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    place-items: end center;
+    padding: 24px;
+    background: rgba(0, 0, 0, .56);
+}
+
+.ios-onboarding {
+    width: min(100%, 440px);
+    padding: 28px 24px;
+    text-align: right;
+    background: #f8fafc;
+    color: #10281d;
+    border-radius: 22px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, .4);
+    font-family: "Cairo", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+.ios-onboarding-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    color: white;
+    background: var(--brand-red-dark);
+    border-radius: 50%;
+    font-size: 1.7rem;
+}
+
+.ios-onboarding h2 { font-size: 1.2rem; margin: 16px 0 8px; }
+.ios-onboarding p { margin: 0; }
+.ios-onboarding ol { margin: 14px 0 22px; padding-right: 22px; line-height: 2; }
+
+.ios-onboarding-dismiss {
+    width: 100%;
+    padding: 12px 18px;
+    color: white;
+    background: var(--brand-red-dark);
+    border: 0;
+    border-radius: 10px;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+}
 
 .player-card {
     width: 100%;

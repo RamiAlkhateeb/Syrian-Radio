@@ -1,4 +1,6 @@
 @page "/"
+@implements IAsyncDisposable
+@inject IJSRuntime JS
 
 <PageTitle>محطات الراديو السورية - البث المباشر</PageTitle>
 
@@ -7,6 +9,7 @@
         <p class="eyebrow">بث مباشر من سوريا</p>
         <h1>اختر محطتك</h1>
         <p>استمع إلى بث محطات الراديو السورية مباشرةً.</p>
+        <a class="about-link" href="/about">عن التطبيق</a>
     </header>
 
     <section class="station-grid" aria-label="Radio stations">
@@ -37,13 +40,61 @@
             </span>
         </a>
 
-        <a class="station-card station-card-ninar" href="/ninar-fm" dir="ltr">
+        <a class="station-card station-card-ninar" href="/ninar-fm" dir="rtl">
             <span class="station-card-logo"><img src="img/ninar-logo.png" alt="شعار نينار FM" /></span>
             <span class="station-card-content">
-                <span class="station-card-name">Ninar FM</span>
-                <span class="station-card-description" lang="ar" dir="rtl">البث المباشر من سوريا</span>
-                <span class="station-card-action" lang="ar" dir="rtl">استمع الآن <span aria-hidden="true">←</span></span>
+                <span class="station-card-name">إذاعة نينار</span>
+                <span class="station-card-description">البث المباشر من سوريا</span>
+                <span class="station-card-action">استمع الآن <span aria-hidden="true">←</span></span>
             </span>
         </a>
     </section>
 </main>
+
+@if (showIosOnboarding)
+{
+    <div class="ios-onboarding-backdrop" role="presentation">
+        <section class="ios-onboarding" role="dialog" aria-modal="true" aria-labelledby="ios-onboarding-title">
+            <span class="ios-onboarding-icon" aria-hidden="true">↥</span>
+            <h2 id="ios-onboarding-title">أضف راديو سوريا إلى الشاشة الرئيسية</h2>
+            <p>للوصول السريع إلى التطبيق من هاتفك:</p>
+            <ol>
+                <li>اضغط زر المشاركة في Safari.</li>
+                <li>اختر <strong>«إضافة إلى الشاشة الرئيسية»</strong>.</li>
+            </ol>
+            <button class="ios-onboarding-dismiss" @onclick="DismissIosOnboarding">فهمت</button>
+        </section>
+    </div>
+}
+
+@code {
+    private IJSObjectReference? onboardingModule;
+    private bool showIosOnboarding;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        onboardingModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/iosOnboarding.js");
+        showIosOnboarding = await onboardingModule.InvokeAsync<bool>("claimFirstVisit");
+
+        if (showIosOnboarding)
+        {
+            StateHasChanged();
+        }
+    }
+
+    private void DismissIosOnboarding() => showIosOnboarding = false;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (onboardingModule is not null)
+        {
+            try
+            {
+                await onboardingModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException) { }
+        }
+    }
+}
