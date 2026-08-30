@@ -11,6 +11,10 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: github-pages
+    permissions:
+      contents: read
+      deployments: write
     steps:
       - name: Check out source
         uses: actions/checkout@v6
