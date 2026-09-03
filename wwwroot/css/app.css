@@ -7,14 +7,21 @@
     --text: #f1f1f1;
     --text-dim: #a3b8aa;
     --accent-rgb: 76, 166, 109;
+    --app-font: "Thmanyah Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
-* { box-sizing: border-box; }
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    font-family: var(--app-font);
+}
 
 html, body {
     height: 100%;
     margin: 0;
-    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    font-family: var(--app-font);
+    font-synthesis: none;
     background: radial-gradient(circle at 30% 20%, var(--brand-red-dark) 0%, var(--bg) 55%);
     color: var(--text);
 }
@@ -47,7 +54,6 @@ html, body {
     justify-content: center;
     max-width: 1120px;
     margin: 0 auto;
-    font-family: "Cairo", "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
 .ninar-theme {
@@ -89,7 +95,7 @@ html, body {
     display: inline-block;
     color: var(--text-dim);
     font-size: .9rem;
-    font-weight: 600;
+    font-weight: 700;
     margin-top: 16px;
     text-decoration: none;
 }
@@ -145,10 +151,6 @@ html, body {
     background: linear-gradient(145deg, #fff, #e9e9e9);
 }
 
-.station-card-sham .station-card-logo {
-    background: #e0f2fe;
-}
-
 .station-card-ninar .station-card-logo img,
 .station-card-sham .station-card-logo img,
 .station-card-syria-tv .station-card-logo img {
@@ -200,7 +202,7 @@ html, body {
     width: min(100%, 380px);
     color: var(--text-dim);
     text-decoration: none;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .back-link:hover,
@@ -214,7 +216,6 @@ html, body {
     align-items: center;
     justify-content: center;
     gap: 20px;
-    font-family: "Cairo", "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
 .about-card {
@@ -265,7 +266,6 @@ html, body {
     color: #10281d;
     border-radius: 22px;
     box-shadow: 0 24px 60px rgba(0, 0, 0, .4);
-    font-family: "Cairo", "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
 .ios-onboarding-icon {
