@@ -7,7 +7,7 @@
     --text: #f1f1f1;
     --text-dim: #a3b8aa;
     --accent-rgb: 76, 166, 109;
-    --app-font: "Thmanyah Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --app-font: "Cairo", "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
 *,
@@ -21,7 +21,6 @@ html, body {
     height: 100%;
     margin: 0;
     font-family: var(--app-font);
-    font-synthesis: none;
     background: radial-gradient(circle at 30% 20%, var(--brand-red-dark) 0%, var(--bg) 55%);
     color: var(--text);
 }
@@ -247,6 +246,7 @@ html, body {
 
 .team-member h3 { margin: 0; font-size: 1.05rem; }
 .team-member p { color: var(--text-dim); margin: 5px 0 0; }
+.team-member-link { display: inline-block; color: var(--brand-red-bright); margin-top: 10px; }
 
 .ios-onboarding-backdrop {
     position: fixed;
