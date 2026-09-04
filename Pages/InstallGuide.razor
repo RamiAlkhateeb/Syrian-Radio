@@ -1,0 +1,101 @@
+@page "/install"
+
+<PageTitle>طريقة تثبيت التطبيق - راديو سوريا</PageTitle>
+
+<main class="install-page" lang="ar" dir="rtl">
+    <div class="install-header">
+        <a class="back-link" href="/">← كل المحطات</a>
+        <h1 class="install-title">إضافة التطبيق إلى الشاشة الرئيسية</h1>
+        <p class="install-subtitle">استمع إلى محطاتك المفضلة بنقرة واحدة من شاشة هاتفك الرئيسية بدون الحاجة لفتح المتصفح في كل مرة.</p>
+    </div>
+
+    <div class="install-card">
+        <!-- Tabs Navigation -->
+        <div class="install-tabs" role="tablist" aria-label="أنظمة التشغيل">
+            <button type="button" 
+                    class="install-tab-btn @(activeTab == "android" ? "active" : "")" 
+                    role="tab" 
+                    aria-selected="@(activeTab == "android" ? "true" : "false")"
+                    @onclick='() => SetTab("android")'>
+                <span class="tab-icon">🤖</span>
+                <span>أندرويد (Android)</span>
+            </button>
+
+            <button type="button" 
+                    class="install-tab-btn @(activeTab == "ios" ? "active" : "")" 
+                    role="tab" 
+                    aria-selected="@(activeTab == "ios" ? "true" : "false")"
+                    @onclick='() => SetTab("ios")'>
+                <span class="tab-icon">🍎</span>
+                <span>آيفون (iPhone / iOS)</span>
+            </button>
+        </div>
+
+        <!-- Tab Content: Android -->
+        @if (activeTab == "android")
+        {
+            <div class="tab-pane active" role="tabpanel">
+                <div class="install-grid">
+                    <div class="install-steps">
+                        <h2>خطوات التثبيت على أندرويد (Google Chrome):</h2>
+                        <ol class="steps-list">
+                            <li>
+                                <strong>افتح المتصفح:</strong> قم بزيارة موقع <span>راديو سوريا</span> عبر متصفح <em>Chrome</em> أو <em>Samsung Internet</em>.
+                            </li>
+                            <li>
+                                <strong>افتح قائمة المتصفح:</strong> اضغط على أيقونة النقاط الثلاث (<strong>⋮</strong>) في زاوية الشاشة.
+                            </li>
+                            <li>
+                                <strong>اختر التثبيت:</strong> اضغط على خيار <strong>«تثبيت التطبيق» (Install app)</strong> أو <strong>«إضافة إلى الشاشة الرئيسية» (Add to Home screen)</strong>.
+                            </li>
+                            <li>
+                                <strong>تأكيد الإضافة:</strong> اضغط على زر <strong>«تثبيت»</strong> وسيكون التطبيق جاهزاً مباشرةً على شاشة هاتفك الرئيسية.
+                            </li>
+                        </ol>
+                    </div>
+                    <div class="install-image-wrapper">
+                        <img src="img/install-android.jpg" alt="تثبيت التطبيق على أندرويد" class="install-screenshot" />
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Tab Content: iPhone / iOS -->
+        @if (activeTab == "ios")
+        {
+            <div class="tab-pane active" role="tabpanel">
+                <div class="install-grid">
+                    <div class="install-steps">
+                        <h2>خطوات التثبيت على آيفون (Safari):</h2>
+                        <ol class="steps-list">
+                            <li>
+                                <strong>افتح متصفح Safari:</strong> تأكد من فتح موقع <span>راديو سوريا</span> باستخدام متصفح <em>Safari</em> الرسمي على جهاز iPhone.
+                            </li>
+                            <li>
+                                <strong>اضغط زر المشاركة:</strong> انقر على زر <strong>المشاركة (Share ⎘)</strong> في أسفل شاشة المتصفح.
+                            </li>
+                            <li>
+                                <strong>إضافة للشاشة الرئيسية:</strong> اسحب القائمة لأسفل واختر <strong>«إضافة إلى الشاشة الرئيسية» (Add to Home Screen ➕)</strong>.
+                            </li>
+                            <li>
+                                <strong>حفظ التطبيق:</strong> اضغط على <strong>«إضافة» (Add)</strong> في أعلى اليسار، وسيظهر رمز التطبيق على شاشتك الرئيسية.
+                            </li>
+                        </ol>
+                    </div>
+                    <div class="install-image-wrapper">
+                        <img src="img/install-ios.jpg" alt="تثبيت التطبيق على آيفون" class="install-screenshot" />
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</main>
+
+@code {
+    private string activeTab = "android";
+
+    private void SetTab(string tab)
+    {
+        activeTab = tab;
+    }
+}
