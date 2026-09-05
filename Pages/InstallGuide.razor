@@ -10,92 +10,88 @@
     </div>
 
     <div class="install-card">
-        <!-- Tabs Navigation -->
-        <div class="install-tabs" role="tablist" aria-label="أنظمة التشغيل">
-            <button type="button" 
-                    class="install-tab-btn @(activeTab == "android" ? "active" : "")" 
-                    role="tab" 
-                    aria-selected="@(activeTab == "android" ? "true" : "false")"
-                    @onclick='() => SetTab("android")'>
-                <span class="tab-icon">🤖</span>
-                <span>أندرويد (Android)</span>
-            </button>
+        <div class="ios-carousel">
+            <p class="ios-carousel-progress">الخطوة <strong>@(Current + 1)</strong> من @Slides.Count</p>
 
-            <button type="button" 
-                    class="install-tab-btn @(activeTab == "ios" ? "active" : "")" 
-                    role="tab" 
-                    aria-selected="@(activeTab == "ios" ? "true" : "false")"
-                    @onclick='() => SetTab("ios")'>
-                <span class="tab-icon">🍎</span>
-                <span>آيفون (iPhone / iOS)</span>
-            </button>
+            <div class="ios-carousel-track" style="transform: translateX(@(Current * -100)%);">
+                @foreach (var slide in Slides)
+                {
+                    <div class="ios-carousel-slide">
+                        <div class="ios-carousel-copy">
+                            <span class="ios-step-badge">@slide.Badge</span>
+                            <h2>@slide.Action</h2>
+                            <p>@slide.Description</p>
+                        </div>
+                        <div class="ios-carousel-image-frame">
+                            <img class="ios-carousel-img" src="@slide.Image" alt="@slide.Alt" loading="eager" />
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="ios-carousel-dots" role="tablist" aria-label="خطوات التثبيت">
+                @for (var i = 0; i < Slides.Count; i++)
+                {
+                    <button type="button"
+                            class="ios-carousel-dot @(i == Current ? "active" : "")"
+                            aria-label="الخطوة @(i + 1)"
+                            aria-selected="@(i == Current)"
+                            role="tab"
+                            @onclick="() => GoTo(i)"></button>
+                }
+            </div>
+
+            <div class="ios-carousel-actions">
+                @if (Current > 0)
+                {
+                    <button type="button" class="ios-nav-back" @onclick="GoBack">← السابق</button>
+                }
+                else
+                {
+                    <span class="ios-nav-spacer"></span>
+                }
+
+                @if (Current < Slides.Count - 1)
+                {
+                    <button type="button" class="ios-nav-next" @onclick="GoNext">التالي ←</button>
+                }
+                else
+                {
+                    <a class="ios-nav-done" href="/">البدء الآن 🎧</a>
+                }
+            </div>
         </div>
-
-        <!-- Tab Content: Android -->
-        @if (activeTab == "android")
-        {
-            <div class="tab-pane active" role="tabpanel">
-                <div class="install-grid">
-                    <div class="install-steps">
-                        <h2>خطوات التثبيت على أندرويد (Google Chrome):</h2>
-                        <ol class="steps-list">
-                            <li>
-                                <strong>افتح المتصفح:</strong> قم بزيارة موقع <span>راديو سوريا</span> عبر متصفح <em>Chrome</em> أو <em>Samsung Internet</em>.
-                            </li>
-                            <li>
-                                <strong>افتح قائمة المتصفح:</strong> اضغط على أيقونة النقاط الثلاث (<strong>⋮</strong>) في زاوية الشاشة.
-                            </li>
-                            <li>
-                                <strong>اختر التثبيت:</strong> اضغط على خيار <strong>«تثبيت التطبيق» (Install app)</strong> أو <strong>«إضافة إلى الشاشة الرئيسية» (Add to Home screen)</strong>.
-                            </li>
-                            <li>
-                                <strong>تأكيد الإضافة:</strong> اضغط على زر <strong>«تثبيت»</strong> وسيكون التطبيق جاهزاً مباشرةً على شاشة هاتفك الرئيسية.
-                            </li>
-                        </ol>
-                    </div>
-                    <div class="install-image-wrapper">
-                        <img src="img/install-android.jpg" alt="تثبيت التطبيق على أندرويد" class="install-screenshot" />
-                    </div>
-                </div>
-            </div>
-        }
-
-        <!-- Tab Content: iPhone / iOS -->
-        @if (activeTab == "ios")
-        {
-            <div class="tab-pane active" role="tabpanel">
-                <div class="install-grid">
-                    <div class="install-steps">
-                        <h2>خطوات التثبيت على آيفون (Safari):</h2>
-                        <ol class="steps-list">
-                            <li>
-                                <strong>افتح متصفح Safari:</strong> تأكد من فتح موقع <span>راديو سوريا</span> باستخدام متصفح <em>Safari</em> الرسمي على جهاز iPhone.
-                            </li>
-                            <li>
-                                <strong>اضغط زر المشاركة:</strong> انقر على زر <strong>المشاركة (Share ⎘)</strong> في أسفل شاشة المتصفح.
-                            </li>
-                            <li>
-                                <strong>إضافة للشاشة الرئيسية:</strong> اسحب القائمة لأسفل واختر <strong>«إضافة إلى الشاشة الرئيسية» (Add to Home Screen ➕)</strong>.
-                            </li>
-                            <li>
-                                <strong>حفظ التطبيق:</strong> اضغط على <strong>«إضافة» (Add)</strong> في أعلى اليسار، وسيظهر رمز التطبيق على شاشتك الرئيسية.
-                            </li>
-                        </ol>
-                    </div>
-                    <div class="install-image-wrapper">
-                        <img src="img/install-ios.jpg" alt="تثبيت التطبيق على آيفون" class="install-screenshot" />
-                    </div>
-                </div>
-            </div>
-        }
     </div>
 </main>
 
 @code {
-    private string activeTab = "android";
+    private sealed record Slide(string Badge, string Action, string Description, string Image, string Alt);
 
-    private void SetTab(string tab)
-    {
-        activeTab = tab;
-    }
+    private List<Slide> Slides { get; } =
+    [
+        new(
+            "الخطوة 1",
+            "افتح الموقع وافتح قائمة المتصفح",
+            "على آيفون اضغط زر المشاركة (⎘)، وعلى أندرويد اضغط أيقونة النقاط الثلاث (⋮) في زاوية الشاشة.",
+            "img/step%201.jpg",
+            "فتح قائمة المتصفح لبدء التثبيت"),
+        new(
+            "الخطوة 2",
+            "اختر «إضافة إلى الشاشة الرئيسية»",
+            "من القائمة اختر خيار «إضافة إلى الشاشة الرئيسية» أو «تثبيت التطبيق» (Add to Home screen).",
+            "img/step%202.jpg",
+            "اختيار إضافة التطبيق إلى الشاشة الرئيسية"),
+        new(
+            "الخطوة 3",
+            "اضغط «إضافة» لتأكيد التثبيت",
+            "اضغط على زر «إضافة» أو «تثبيت»، وسيظهر رمز التطبيق مباشرة على شاشة هاتفك الرئيسية.",
+            "img/step%203.jpg",
+            "تأكيد إضافة التطبيق إلى الشاشة الرئيسية")
+    ];
+
+    private int Current { get; set; }
+
+    private void GoBack() => GoTo(Current - 1);
+    private void GoNext() => GoTo(Current + 1);
+    private void GoTo(int index) => Current = Math.Clamp(index, 0, Slides.Count - 1);
 }

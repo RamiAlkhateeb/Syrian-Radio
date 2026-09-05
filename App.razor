@@ -1,3 +1,6 @@
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
 <Router AppAssembly="@typeof(App).Assembly">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(Layout.MainLayout)" />
@@ -8,3 +11,23 @@
         </LayoutView>
     </NotFound>
 </Router>
+
+@code {
+    protected override void OnInitialized()
+    {
+        Navigation.LocationChanged += OnLocationChanged;
+    }
+
+    // Track client-side route changes as GA4 page views (when analytics is enabled).
+    private async void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("trackPageView", e.Location);
+        }
+        catch
+        {
+            // Analytics disabled or JS not available — safe to ignore.
+        }
+    }
+}

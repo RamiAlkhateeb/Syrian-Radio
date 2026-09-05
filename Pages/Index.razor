@@ -4,51 +4,50 @@
 
 <PageTitle>محطات الراديو السورية - البث المباشر</PageTitle>
 
-<main class="station-directory" lang="ar" dir="rtl">
-    <header class="directory-header">
-        <p class="eyebrow">بث مباشر من سوريا</p>
-        <h1>اختر محطتك</h1>
-        <p>استمع إلى بث محطات الراديو السورية مباشرةً.</p>
-        <a class="about-link" href="/about">عن التطبيق</a>
-    </header>
+<main class="radio-app" lang="ar" dir="rtl">
+    <div class="radio-device">
+        <!-- Top: brand + on-air status -->
+        <header class="radio-topbar">
+            <span class="radio-brand-word">راديو سوريا</span>
+            <span class="radio-onair"><span class="radio-onair-dot"></span>ON AIR</span>
+        </header>
 
-    <section class="station-grid" aria-label="Radio stations">
-        <a class="station-card station-card-sham" href="http://radio.sham.fm/" dir="rtl">
-            <span class="station-card-logo"><img src="img/sham-fm-logo.png" alt="شعار شام FM" /></span>
-            <span class="station-card-content">
-                <span class="station-card-name">شام FM</span>
-                <span class="station-card-description">استمع إلى البث المباشر</span>
-                <span class="station-card-action">فتح البث <span aria-hidden="true">←</span></span>
-            </span>
+        <!-- Display: station frequency + logo -->
+        <div class="radio-display">
+            <div class="radio-dial">@Stations[Current].Dial</div>
+            <div class="radio-now">
+                <img class="radio-now-logo" src="@Stations[Current].Logo" alt="شعار @Stations[Current].Name" />
+                <div class="radio-now-meta">
+                    <strong class="radio-now-name">@Stations[Current].Name</strong>
+                    <span class="radio-now-desc">@Stations[Current].Description</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tuning roller: slide to change the channel -->
+        <div class="radio-tuner">
+            <div class="radio-tuner-labels">
+                @foreach (var s in Stations)
+                {
+                    <span class="@(s == Stations[Current] ? "on" : "")">@s.ShortLabel</span>
+                }
+            </div>
+            <input class="radio-roller"
+                   type="range"
+                   min="0" max="@(Stations.Count - 1)" step="1"
+                   value="@Current"
+                   aria-label="ضبط المحطة"
+                   @oninput="OnTune" />
+        </div>
+
+        <!-- Action -->
+        <a class="radio-listen" href="@Stations[Current].Href" dir="rtl">
+            <span>@Stations[Current].ActionText</span>
+            <span class="radio-listen-arrow" aria-hidden="true">◀</span>
         </a>
 
-        <a class="station-card station-card-damascus" href="https://damasradio.fm/" dir="rtl">
-            <span class="station-card-logo"><img src="img/radio-damascus-logo.svg" alt="شعار إذاعة دمشق" /></span>
-            <span class="station-card-content">
-                <span class="station-card-name">إذاعة دمشق</span>
-                <span class="station-card-description">البث المباشر من دمشق</span>
-                <span class="station-card-action">استمع الآن <span aria-hidden="true">←</span></span>
-            </span>
-        </a>
-
-        <a class="station-card station-card-syria-tv" href="https://www.syria.tv/%D8%B1%D8%A7%D8%AF%D9%8A%D9%88-%D8%B3%D9%88%D8%B1%D9%8A%D8%A7" dir="rtl">
-            <span class="station-card-logo"><img src="img/syria-tv.png" alt="شعار راديو سوريا" /></span>
-            <span class="station-card-content">
-                <span class="station-card-name">راديو سوريا</span>
-                <span class="station-card-description">استمع إلى البث المباشر</span>
-                <span class="station-card-action">فتح البث <span aria-hidden="true">←</span></span>
-            </span>
-        </a>
-
-        <a class="station-card station-card-ninar" href="/ninar-fm" dir="rtl">
-            <span class="station-card-logo"><img src="img/ninar-logo.png" alt="شعار نينار FM" /></span>
-            <span class="station-card-content">
-                <span class="station-card-name">إذاعة نينار</span>
-                <span class="station-card-description">البث المباشر من سوريا</span>
-                <span class="station-card-action">استمع الآن <span aria-hidden="true">←</span></span>
-            </span>
-        </a>
-    </section>
+        <a class="radio-about-link" href="/about">عن التطبيق</a>
+    </div>
 </main>
 
 @if (showIosOnboarding)
@@ -68,6 +67,34 @@
 }
 
 @code {
+    private sealed record Station(
+        string Name,
+        string ShortLabel,
+        string Dial,
+        string Description,
+        string ActionText,
+        string Logo,
+        string Href);
+
+    // NOTE: FM frequencies below are approximate/illustrative dial labels.
+    private List<Station> Stations { get; } =
+    [
+        new Station("نينار FM", "نينار", "89.6 FM", "البث المباشر من سوريا", "استمع الآن", "img/ninar-logo.png", "/ninar-fm"),
+        new Station("شام FM", "شام", "92.3 FM", "أغانٍ وأخبار من دمشق", "فتح البث", "img/sham-fm-logo.png", "http://radio.sham.fm/"),
+        new Station("إذاعة دمشق", "دمشق", "95.0 FM", "البث الرسمي من دمشق", "استمع الآن", "img/radio-damascus-logo.svg", "https://damasradio.fm/"),
+        new Station("راديو سوريا", "سوريا", "WEB", "البث المباشر لقناة سوريا", "فتح البث", "img/syria-tv.png", "https://www.syria.tv/%D8%B1%D8%A7%D8%AF%D9%8A%D9%88-%D8%B3%D9%88%D8%B1%D9%8A%D8%A7")
+    ];
+
+    private int Current { get; set; }
+
+    private void OnTune(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var index))
+        {
+            Current = Math.Clamp(index, 0, Stations.Count - 1);
+        }
+    }
+
     private IJSObjectReference? onboardingModule;
     private bool showIosOnboarding;
 
