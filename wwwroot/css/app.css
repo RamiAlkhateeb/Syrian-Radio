@@ -29,6 +29,7 @@ html, body {
     font-family: var(--app-font);
     background-color: var(--bg, #f7f7f9);
     color: var(--text);
+    touch-action: manipulation;
 }
 
 .initial-loading {
@@ -884,6 +885,13 @@ html, body {
     margin: 8px 0 6px;
 }
 
+.ios-station-desc {
+    font-size: 0.95rem;
+    color: #8e8e93;
+    margin: 0 0 16px 0;
+    text-align: center;
+}
+
 .ios-other-stations-btn {
     background: none;
     border: none;
@@ -952,6 +960,14 @@ html, body {
     border-bottom: 1px solid #dcdce0;
     position: relative;
     overflow: hidden;
+    cursor: grab;
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.ios-tuner-viewport.is-dragging {
+    cursor: grabbing;
 }
 
 .ios-tuner-needle {
@@ -973,9 +989,14 @@ html, body {
     align-items: flex-start;
     position: absolute;
     top: 0;
-    left: 0;
+    left: 50%;
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     will-change: transform;
+    touch-action: pan-y;
+}
+
+.ios-tuner-track.dragging {
+    transition: none !important;
 }
 
 .ios-tuner-unit {
@@ -1035,17 +1056,22 @@ html, body {
     pointer-events: none;
 }
 
-.ios-tuner-subticks .ios-tuner-mark:nth-child(1) { left: 20%; }
-.ios-tuner-subticks .ios-tuner-mark:nth-child(2) { left: 40%; }
-.ios-tuner-subticks .ios-tuner-mark:nth-child(3) { left: 60%; }
-.ios-tuner-subticks .ios-tuner-mark:nth-child(4) { left: 80%; }
+.ios-tuner-subticks .ios-tuner-mark:nth-child(1) { left: 10%; }
+.ios-tuner-subticks .ios-tuner-mark:nth-child(2) { left: 20%; }
+.ios-tuner-subticks .ios-tuner-mark:nth-child(3) { left: 30%; }
+.ios-tuner-subticks .ios-tuner-mark:nth-child(4) { left: 40%; }
+.ios-tuner-subticks .ios-tuner-mark:nth-child(5) { left: 50%; }
+.ios-tuner-subticks .ios-tuner-mark:nth-child(6) { left: 60%; }
+.ios-tuner-subticks .ios-tuner-mark:nth-child(7) { left: 70%; }
+.ios-tuner-subticks .ios-tuner-mark:nth-child(8) { left: 80%; }
+.ios-tuner-subticks .ios-tuner-mark:nth-child(9) { left: 90%; }
 
 .ios-tuner-slider {
     position: absolute;
     inset: 0;
     opacity: 0;
-    cursor: ew-resize;
-    z-index: 15;
+    pointer-events: none;
+    z-index: 5;
     width: 100%;
     height: 100%;
     margin: 0;
@@ -1124,12 +1150,15 @@ html, body {
     box-shadow: 0 0 0 6px rgba(var(--accent-rgb), 0.15), 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
-.ios-external-hint {
+.ios-external-hint,
+.ios-playback-hint {
     font-size: 0.78rem;
     font-weight: 600;
     color: #8e8e93;
     text-align: center;
     margin-top: -6px;
+    min-height: 1.25em;
+    line-height: 1.25;
 }
 
 /* Volume Control Bar */

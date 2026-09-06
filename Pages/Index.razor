@@ -9,10 +9,10 @@
         <!-- Top spacer / subtle indicator -->
         <header class="ios-radio-top">
             <div class="ios-brand-badge">
-                <span class="ios-live-indicator @(CurrentStation.IsLiveStream && isPlaying ? "active" : "")"></span>
+                <span class="ios-live-indicator @(IsLiveStream && isPlaying ? "active" : "")"></span>
                 <span>راديو سوريا</span>
             </div>
-            @if (CurrentStation.IsLiveStream)
+            @if (IsLiveStream)
             {
                 <span class="ios-status-pill @statusClass">@statusText</span>
             }
@@ -25,11 +25,11 @@
         <!-- Main Display: Frequency + Station Name -->
         <section class="ios-station-display">
             <div class="ios-frequency-wrap" dir="ltr">
-                <span class="ios-frequency-val">@CurrentStation.DialFrequency</span>
-                <span class="ios-frequency-unit">@CurrentStation.DialUnit</span>
+                <span class="ios-frequency-val">@DisplayFrequency</span>
+                <span class="ios-frequency-unit">@DisplayUnit</span>
             </div>
 
-            <h1 class="ios-station-title">@CurrentStation.Name</h1>
+            <h1 class="ios-station-title">@DisplayName</h1>
 
             <button type="button" class="ios-other-stations-btn" @onclick="ToggleStationsSheet">
                 محطات أخرى
@@ -68,23 +68,28 @@
 
         <!-- FM Frequency Tuner Scale -->
         <section class="ios-tuner-section">
-            <div class="ios-tuner-viewport">
+            <div id="tuner-viewport" class="ios-tuner-viewport">
                 <!-- Center Red Needle Indicator -->
                 <div class="ios-tuner-needle" aria-hidden="true"></div>
 
                 <!-- Tuner Scale Track -->
-                <div class="ios-tuner-track" style="transform: translateX(calc(50% + @(TunerOffsetPx)px));" dir="ltr">
+                <div id="tuner-track" class="ios-tuner-track" style="transform: translateX(@(TunerOffsetStyle)px);" dir="ltr">
                     @for (int mhz = 86; mhz <= 106; mhz++)
                     {
                         var freqVal = mhz;
-                        var isStationNear = Stations.Any(s => Math.Abs(s.Frequency - freqVal) < 0.2);
+                        var isStationNear = Stations.Any(s => Math.Abs(s.Frequency - freqVal) < 0.25 || (int)Math.Round(s.Frequency) == freqVal);
                         <div class="ios-tuner-unit @(isStationNear ? "station-mark" : "")" @onclick="() => TuneToMhz(freqVal)">
                             <div class="ios-tuner-mark major"></div>
                             <span class="ios-tuner-num">@freqVal</span>
                             <div class="ios-tuner-subticks">
                                 <div class="ios-tuner-mark minor"></div>
                                 <div class="ios-tuner-mark minor"></div>
+                                <div class="ios-tuner-mark minor"></div>
+                                <div class="ios-tuner-mark minor"></div>
                                 <div class="ios-tuner-mark med"></div>
+                                <div class="ios-tuner-mark minor"></div>
+                                <div class="ios-tuner-mark minor"></div>
+                                <div class="ios-tuner-mark minor"></div>
                                 <div class="ios-tuner-mark minor"></div>
                             </div>
                         </div>
@@ -92,13 +97,14 @@
                 </div>
             </div>
 
-            <!-- Invisible range input for effortless slider/touch scrubbing -->
+            <!-- Invisible range input for accessibility -->
             <input type="range"
                    class="ios-tuner-slider"
-                   min="0"
-                   max="@(Stations.Count - 1)"
-                   step="1"
-                   value="@currentIndex"
+                   dir="ltr"
+                   min="86.0"
+                   max="106.0"
+                   step="0.1"
+                   value="@currentFrequency.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)"
                    aria-label="ضبط التردد"
                    @oninput="OnSliderInput" />
         </section>
@@ -115,12 +121,12 @@
                 </button>
 
                 <!-- Big Play/Pause / Launch Button -->
-                @if (CurrentStation.IsLiveStream)
+                @if (IsLiveStream)
                 {
                     <button type="button"
                             class="ios-play-btn @(isPlaying ? "playing" : "")"
                             @onclick="TogglePlay"
-                            aria-label="@(isPlaying ? "إيقاف مؤقت" : "تشغيل نينار FM")">
+                            aria-label="@(isPlaying ? "إيقاف مؤقت" : "تشغيل")">
                         @if (isPlaying)
                         {
                             <!-- Pause Bars -->
@@ -143,7 +149,7 @@
                     <button type="button"
                             class="ios-play-btn external"
                             @onclick="OpenExternalStation"
-                            aria-label="فتح البث الرسمي لـ @CurrentStation.Name">
+                            aria-label="فتح البث الرسمي لـ @CurrentStation?.Name">
                         <!-- External Link / Launch Icon -->
                         <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
@@ -162,12 +168,23 @@
                 </button>
             </div>
 
-            @if (!CurrentStation.IsLiveStream)
-            {
-                <div class="ios-external-hint">
-                    اضغط للفتح على الموقع الرسمي لـ @CurrentStation.Name
-                </div>
-            }
+            <div class="ios-playback-hint">
+                @if (CurrentStation != null)
+                {
+                    @if (CurrentStation.IsLiveStream)
+                    {
+                        @(isPlaying ? $"البث المباشر يعمل لـ {CurrentStation.Name}" : $"اضغط للاستماع إلى البث المباشر لـ {CurrentStation.Name}")
+                    }
+                    else
+                    {
+                        @($"اضغط للفتح على الموقع الرسمي لـ {CurrentStation.Name}")
+                    }
+                }
+                else
+                {
+                    @(isPlaying ? "صوت التشويش يعمل الآن" : "ابحث عن محطة أو استمع لصوت التشويش")
+                }
+            </div>
 
             <!-- Volume Control Bar -->
             <div class="ios-volume-container" dir="ltr">
@@ -337,9 +354,9 @@
             "syria-tv",
             "راديو سوريا",
             "سوريا",
-            "WEB",
-            "LIVE",
-            "WEB",
+            "102,0",
+            "FM",
+            "102.0 FM",
             102.0,
             "البث المباشر لقناة سوريا",
             "img/syria-tv.png",
@@ -349,15 +366,22 @@
             false)
     ];
 
-    private int currentIndex = 0;
-    private Station CurrentStation => Stations[currentIndex];
+    private double currentFrequency = 89.6;
+    private int? currentIndex = 0;
+    private Station? CurrentStation => currentIndex.HasValue ? Stations[currentIndex.Value] : null;
+
+    private string DisplayName => CurrentStation?.Name ?? "تشويش";
+    private string DisplayFrequency => CurrentStation?.DialFrequency ?? currentFrequency.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture).Replace('.', ',');
+    private string DisplayUnit => CurrentStation?.DialUnit ?? "FM";
+    private string DisplayDescription => CurrentStation?.Description ?? "ابحث عن محطة...";
+    private bool IsLiveStream => CurrentStation?.IsLiveStream ?? true;
 
     // Tuner ruler offset: each 1 MHz = 70px. Scale starts at 86 MHz.
-    // When Frequency is F, offset is -((F - 86) * 70)
-    // Combined with calc(50% + offset) in CSS to center directly under needle
+    // Scale track is centered at 50% in CSS, so offset moves frequency directly under needle
     private const double PxPerMhz = 70.0;
     private const double BaseMhz = 86.0;
-    private double TunerOffsetPx => -((CurrentStation.Frequency - BaseMhz) * PxPerMhz);
+    private double TunerOffsetPx => -((currentFrequency - BaseMhz) * PxPerMhz);
+    private string TunerOffsetStyle => TunerOffsetPx.ToString("F1", System.Globalization.CultureInfo.InvariantCulture);
 
     // Audio Player State
     private readonly string audioElementId = "syrian-radio-audio-" + Guid.NewGuid().ToString("N");
@@ -387,7 +411,9 @@
             playerModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/radioPlayer.js");
             dotNetRef = DotNetObjectReference.Create(this);
             await playerModule.InvokeVoidAsync("init", audioElementId, dotNetRef);
+            await playerModule.InvokeVoidAsync("initTuner", "tuner-viewport", "tuner-track", dotNetRef, BaseMhz, 106.0, PxPerMhz);
             await playerModule.InvokeVoidAsync("setVolume", volume / 100.0);
+            await playerModule.InvokeVoidAsync("updateTunerPosition", currentFrequency);
         }
         catch (Exception ex)
         {
@@ -408,25 +434,36 @@
 
     private async Task TogglePlay()
     {
-        if (playerModule is null || !CurrentStation.IsLiveStream) return;
+        if (playerModule is null) return;
+        if (!IsLiveStream) return; // External station
 
         if (isPlaying)
         {
             await playerModule.InvokeVoidAsync("pause");
+            await playerModule.InvokeVoidAsync("stopStatic");
             isPlaying = false;
             SetStatus("paused", "متوقف مؤقتاً");
         }
         else
         {
-            SetStatus("buffering", "جارٍ الاتصال...");
             isPlaying = true;
-            await playerModule.InvokeVoidAsync("play", CurrentStation.StreamUrl, CurrentStation.UseProxy);
+            if (currentIndex.HasValue)
+            {
+                var st = Stations[currentIndex.Value];
+                SetStatus("buffering", "جارٍ الاتصال...");
+                await playerModule.InvokeVoidAsync("play", st.StreamUrl, st.UseProxy);
+            }
+            else
+            {
+                SetStatus("live", "تشويش");
+                await playerModule.InvokeVoidAsync("playStatic", volume / 100.0);
+            }
         }
     }
 
     private async Task OpenExternalStation()
     {
-        if (string.IsNullOrEmpty(CurrentStation.Href)) return;
+        if (string.IsNullOrEmpty(CurrentStation?.Href)) return;
         await JS.InvokeVoidAsync("open", CurrentStation.Href, "_blank");
     }
 
@@ -472,55 +509,135 @@
 
     private void PrevStation()
     {
-        var prev = currentIndex - 1;
+        var prev = (currentIndex.HasValue ? currentIndex.Value : 0) - 1;
         if (prev < 0) prev = Stations.Count - 1;
-        ChangeStation(prev);
+        _ = ChangeFrequencyAndStation(Stations[prev].Frequency, updateTunerJs: true);
     }
 
     private void NextStation()
     {
-        var next = (currentIndex + 1) % Stations.Count;
-        ChangeStation(next);
+        var next = ((currentIndex.HasValue ? currentIndex.Value : -1) + 1) % Stations.Count;
+        _ = ChangeFrequencyAndStation(Stations[next].Frequency, updateTunerJs: true);
     }
 
     private void OnSliderInput(ChangeEventArgs e)
     {
-        if (int.TryParse(e.Value?.ToString(), out var idx))
+        if (double.TryParse(e.Value?.ToString(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var freq))
         {
-            ChangeStation(Math.Clamp(idx, 0, Stations.Count - 1));
+            _ = ChangeFrequencyAndStation(freq, updateTunerJs: true);
         }
     }
 
     private void TuneToMhz(int mhz)
     {
-        var closestIdx = 0;
+        _ = ChangeFrequencyAndStation(mhz, updateTunerJs: true);
+    }
+
+    [JSInvokable]
+    public async Task OnTunerScrolled(double freq)
+    {
+        await ChangeFrequencyAndStation(freq, updateTunerJs: false);
+    }
+
+    [JSInvokable]
+    public async Task OnTunerReleased(double freq)
+    {
+        var closestIdx = -1;
         var minDiff = double.MaxValue;
         for (int i = 0; i < Stations.Count; i++)
         {
-            var diff = Math.Abs(Stations[i].Frequency - mhz);
-            if (diff < minDiff)
+            var diff = Math.Abs(Stations[i].Frequency - freq);
+            if (diff < 0.25)
             {
-                minDiff = diff;
-                closestIdx = i;
+                if (diff < minDiff)
+                {
+                    minDiff = diff;
+                    closestIdx = i;
+                }
             }
         }
-        ChangeStation(closestIdx);
+
+        if (closestIdx != -1)
+        {
+            await ChangeFrequencyAndStation(Stations[closestIdx].Frequency, updateTunerJs: true);
+        }
     }
 
-    private void ChangeStation(int newIndex)
+    private async Task ChangeFrequencyAndStation(double newFreq, bool updateTunerJs = true)
     {
-        if (newIndex == currentIndex) return;
-
-        // If changing away from Ninar while playing, pause stream
-        if (CurrentStation.IsLiveStream && isPlaying && !Stations[newIndex].IsLiveStream)
+        currentFrequency = Math.Round(newFreq, 1);
+        
+        int? nextIndex = null;
+        for (int i = 0; i < Stations.Count; i++)
         {
-            _ = playerModule?.InvokeVoidAsync("pause");
-            isPlaying = false;
-            SetStatus("idle", "جاهز");
+            if (Math.Abs(Stations[i].Frequency - currentFrequency) < 0.25)
+            {
+                nextIndex = i;
+                currentFrequency = Stations[i].Frequency;
+                break;
+            }
         }
 
-        currentIndex = newIndex;
+        if (currentIndex != nextIndex)
+        {
+            currentIndex = nextIndex;
+            await HandleStationChanged();
+        }
+
+        if (updateTunerJs && playerModule is not null)
+        {
+            try
+            {
+                await playerModule.InvokeVoidAsync("updateTunerPosition", currentFrequency);
+            }
+            catch { }
+        }
+        
         StateHasChanged();
+    }
+
+    private async Task HandleStationChanged()
+    {
+        if (playerModule is null) return;
+
+        if (currentIndex.HasValue)
+        {
+            var st = Stations[currentIndex.Value];
+            await playerModule.InvokeVoidAsync("stopStatic");
+            if (isPlaying)
+            {
+                if (st.IsLiveStream)
+                {
+                    SetStatus("buffering", "جارٍ الاتصال...");
+                    await playerModule.InvokeVoidAsync("play", st.StreamUrl, st.UseProxy);
+                }
+                else
+                {
+                    _ = playerModule.InvokeVoidAsync("pause");
+                    isPlaying = false;
+                    SetStatus("idle", "جاهز");
+                }
+            }
+            else
+            {
+                _ = playerModule.InvokeVoidAsync("pause");
+                SetStatus("idle", "جاهز");
+            }
+        }
+        else
+        {
+            _ = playerModule.InvokeVoidAsync("pause");
+            if (isPlaying)
+            {
+                SetStatus("live", "تشويش");
+                await playerModule.InvokeVoidAsync("playStatic", volume / 100.0);
+            }
+            else
+            {
+                SetStatus("idle", "جاهز");
+                await playerModule.InvokeVoidAsync("stopStatic");
+            }
+        }
     }
 
     private void ToggleStationsSheet()
@@ -531,16 +648,16 @@
     private void SelectStationFromSheet(int index)
     {
         showStationsSheet = false;
-        ChangeStation(index);
+        _ = ChangeFrequencyAndStation(Stations[index].Frequency, updateTunerJs: true);
     }
 
     private sealed record ShareResult(bool Success, string Method);
 
     private async Task OnShareClicked()
     {
-        var shareText = $"اسمع هالمحطة معي: {CurrentStation.Name}";
+        var shareText = $"اسمع هالمحطة معي: {DisplayName}";
         var shareUrl = "https://syrian-radio.pages.dev/";
-        var shareTitle = $"{CurrentStation.Name} - راديو سوريا";
+        var shareTitle = $"{DisplayName} - راديو سوريا";
 
         whatsappShareUrl = $"https://api.whatsapp.com/send?text={Uri.EscapeDataString(shareText + " " + shareUrl)}";
 
