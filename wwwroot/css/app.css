@@ -1,13 +1,14 @@
 :root {
-    --brand-red-bright: #4ca66d;
-    --brand-red-dark: #123d2d;
-    --brand-black: #071b14;
-    --bg: #061a13;
-    --card-bg: #10281d;
-    --text: #f1f1f1;
-    --text-dim: #a3b8aa;
-    --accent-rgb: 76, 166, 109;
-    --app-font: "Cairo", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --brand-red-bright: #ff2d55;
+    --brand-red-dark: #e11d48;
+    --brand-black: #1c1c1e;
+    --bg: #f7f7f9;
+    --card-bg: #ffffff;
+    --text: #1c1c1e;
+    --text-dim: #8e8e93;
+    --border: #e5e5ea;
+    --accent-rgb: 255, 45, 85;
+    --app-font: "Cairo", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 *,
@@ -18,7 +19,7 @@
 }
 
 html {
-    background-color: var(--bg, #061a13);
+    background-color: var(--bg, #f7f7f9);
 }
 
 html, body {
@@ -26,9 +27,7 @@ html, body {
     min-height: 100dvh;
     margin: 0;
     font-family: var(--app-font);
-    background-color: var(--bg, #061a13);
-    background-image: radial-gradient(circle at 30% 20%, var(--brand-red-dark) 0%, var(--bg) 55%);
-    background-attachment: fixed;
+    background-color: var(--bg, #f7f7f9);
     color: var(--text);
 }
 
@@ -248,9 +247,9 @@ html, body {
     padding: 32px 28px;
     text-align: center;
     background: var(--card-bg);
-    border: 1px solid rgba(255, 255, 255, .08);
-    border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, .35);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, .07);
 }
 
 .about-logo {
@@ -260,19 +259,20 @@ html, body {
     border-radius: 22px;
 }
 
-.about-card h1 { margin: 18px 0 8px; }
+.about-card h1 { margin: 18px 0 8px; color: var(--text); }
 .about-card > p { color: var(--text-dim); line-height: 1.8; margin: 0; }
-.about-card h2 { font-size: 1.2rem; margin: 30px 0 12px; }
+.about-card h2 { font-size: 1.2rem; margin: 30px 0 12px; color: var(--text); }
 
 .team-member {
     padding: 16px;
-    background: rgba(255, 255, 255, .05);
-    border-radius: 12px;
+    background: #f2f2f7;
+    border-radius: 14px;
+    border: 1px solid var(--border);
 }
 
-.team-member h3 { margin: 0; font-size: 1.05rem; }
+.team-member h3 { margin: 0; font-size: 1.05rem; color: var(--text); }
 .team-member p { color: var(--text-dim); margin: 5px 0 0; }
-.team-member-link { display: inline-block; color: var(--brand-red-bright); margin-top: 10px; }
+.team-member-link { display: inline-block; color: var(--brand-red-bright); margin-top: 10px; font-weight: 700; text-decoration: none; }
 
 .ios-onboarding-backdrop {
     position: fixed;
@@ -475,10 +475,10 @@ html, body {
 .install-page {
     min-height: 100vh;
     min-height: 100dvh;
-    padding-top: calc(48px + env(safe-area-inset-top, 0px));
+    padding-top: calc(36px + env(safe-area-inset-top, 0px));
     padding-bottom: calc(48px + env(safe-area-inset-bottom, 0px));
-    padding-left: calc(24px + env(safe-area-inset-left, 0px));
-    padding-right: calc(24px + env(safe-area-inset-right, 0px));
+    padding-left: calc(20px + env(safe-area-inset-left, 0px));
+    padding-right: calc(20px + env(safe-area-inset-right, 0px));
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -488,44 +488,84 @@ html, body {
 
 .install-header {
     text-align: center;
-    margin-bottom: 32px;
+    margin-bottom: 24px;
     width: 100%;
 }
 
 .install-header .back-link {
     display: inline-block;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
+    color: var(--brand-red-bright);
+    text-decoration: none;
+    font-weight: 700;
 }
 
 .install-title {
-    font-size: clamp(1.8rem, 4vw, 2.75rem);
-    margin: 0 0 12px;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    margin: 0 0 10px;
+    color: var(--text);
 }
 
 .install-subtitle {
     color: var(--text-dim);
-    font-size: 1.05rem;
+    font-size: 1rem;
     max-width: 600px;
-    margin: 0 auto;
+    margin: 0 auto 20px;
     line-height: 1.6;
+}
+
+/* Platform Switcher Tabs */
+.install-tabs {
+    display: inline-flex;
+    background: #e5e5ea;
+    padding: 4px;
+    border-radius: 14px;
+    gap: 4px;
+    margin: 0 auto;
+}
+
+.install-tab-btn {
+    border: none;
+    background: transparent;
+    padding: 9px 20px;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-dim);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.install-tab-btn.active {
+    background: #ffffff;
+    color: var(--text);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tab-badge-icon {
+    font-size: 1.1rem;
 }
 
 .install-card {
     width: min(100%, 640px);
     background: var(--card-bg);
-    border: 1px solid rgba(255, 255, 255, .08);
+    border: 1px solid var(--border);
     border-radius: 24px;
-    padding: 32px 28px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, .4);
+    padding: 28px 24px;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, .07);
 }
 
 @media (max-width: 600px) {
     .install-card {
-        padding: 22px 16px 24px;
+        padding: 20px 14px;
     }
 }
 
-/* Swipeable step-by-step carousel (mirrors the NxtWeek AddToHomeCarousel design) */
+/* Swipeable step-by-step carousel */
 .ios-carousel {
     position: relative;
     width: 100%;
@@ -537,27 +577,38 @@ html, body {
 .ios-carousel-progress {
     text-align: center;
     color: var(--text-dim);
-    font-size: .92rem;
-    margin: 0 0 14px;
+    font-size: .9rem;
+    margin: 0 0 12px;
 }
 
 .ios-carousel-progress strong {
     color: var(--text);
 }
 
+/* Dedicated clipping viewport that isolates track transform from outer card */
+.ios-carousel-viewport {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    border-radius: 16px;
+    direction: ltr;
+    background: #f2f2f7;
+    border: 1px solid var(--border);
+}
+
 .ios-carousel-track {
     display: flex;
     direction: ltr;
-    overflow: hidden;
-    border-radius: 16px;
-    transition: transform .35s ease;
-    background: rgba(255, 255, 255, .03);
-    border: 1px solid rgba(255, 255, 255, .08);
+    width: 100%;
+    transition: transform .35s cubic-bezier(0.25, 1, 0.5, 1);
+    will-change: transform;
 }
 
 .ios-carousel-slide {
     flex: 0 0 100%;
+    width: 100%;
     min-width: 100%;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
 }
@@ -565,7 +616,7 @@ html, body {
 .ios-carousel-copy {
     direction: rtl;
     text-align: center;
-    padding: 18px 18px 6px;
+    padding: 16px 16px 6px;
 }
 
 .ios-step-badge {
@@ -573,24 +624,23 @@ html, body {
     margin-bottom: 8px;
     padding: 3px 12px;
     border-radius: 12px;
-    background: rgba(var(--accent-rgb), .16);
+    background: rgba(var(--accent-rgb), .12);
     color: var(--brand-red-bright);
     font-size: .78rem;
     font-weight: 800;
-    letter-spacing: .3px;
 }
 
 .ios-carousel-copy h2 {
-    margin: 0 0 8px;
-    font-size: 1.3rem;
+    margin: 0 0 6px;
+    font-size: 1.25rem;
     color: var(--text);
 }
 
 .ios-carousel-copy p {
     margin: 0;
     color: var(--text-dim);
-    font-size: .98rem;
-    line-height: 1.7;
+    font-size: .95rem;
+    line-height: 1.6;
     max-width: 520px;
     margin-inline: auto;
 }
@@ -599,7 +649,7 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 6px 6px;
+    padding: 8px 12px 14px;
     min-height: 0;
 }
 
@@ -607,11 +657,11 @@ html, body {
     display: block;
     width: auto;
     max-width: 100%;
-    max-height: min(56vh, 460px);
+    max-height: min(52vh, 420px);
     object-fit: contain;
     border-radius: 16px;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, .55);
-    border: 3px solid rgba(255, 255, 255, .1);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .14);
+    border: 2px solid rgba(0, 0, 0, .06);
 }
 
 .ios-carousel-dots {
@@ -627,7 +677,7 @@ html, body {
     padding: 0;
     border: none;
     border-radius: 50%;
-    background: rgba(255, 255, 255, .18);
+    background: #d1d1d6;
     cursor: pointer;
     transition: background .2s ease, transform .2s ease;
 }
@@ -647,250 +697,693 @@ html, body {
 
 .ios-carousel-actions > * {
     flex: 1;
-    min-height: 48px;
+    min-height: 46px;
 }
 
 .ios-carousel-actions button,
 .ios-carousel-actions a {
     border: none;
-    border-radius: 14px;
+    border-radius: 12px;
     font-family: inherit;
-    font-size: 1.02rem;
-    font-weight: 800;
+    font-size: 1rem;
+    font-weight: 700;
     cursor: pointer;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: background .2s ease, box-shadow .2s ease;
+    transition: all .2s ease;
 }
 
 .ios-nav-back {
     color: var(--brand-red-bright);
-    background: rgba(var(--accent-rgb), .15);
+    background: rgba(var(--accent-rgb), .1);
 }
 
 .ios-nav-back:hover {
-    background: rgba(var(--accent-rgb), .25);
+    background: rgba(var(--accent-rgb), .18);
 }
 
-.ios-nav-next {
-    color: white;
-    background: var(--brand-red-bright);
-    box-shadow: 0 6px 18px rgba(var(--accent-rgb), .35);
-}
-
-.ios-nav-next:hover {
-    filter: brightness(1.08);
-}
-
+.ios-nav-next,
 .ios-nav-done {
     color: white;
     background: var(--brand-red-bright);
-    box-shadow: 0 6px 18px rgba(var(--accent-rgb), .35);
+    box-shadow: 0 4px 14px rgba(var(--accent-rgb), .3);
 }
 
+.ios-nav-next:hover,
 .ios-nav-done:hover {
-    filter: brightness(1.08);
+    filter: brightness(1.06);
+    transform: translateY(-1px);
 }
 
 .ios-nav-spacer {
     flex: 1;
 }
 
-/* Touch swipe: let the images/slides scroll only when actively swiping.
-   We rely on the buttons + dots for navigation; links are omitted deliberately. */
 @media (max-width: 600px) {
     .ios-carousel-img {
-        max-height: 46vh;
+        max-height: 44vh;
     }
 }
 
 /* ==========================================================================
-   Radio home page — minimal tuning-roller receiver
+   iOS Radio Home Page — Minimalist Light Radio Receiver
    ========================================================================== */
-.radio-app {
+.ios-radio-screen {
     min-height: 100vh;
     min-height: 100dvh;
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: var(--bg);
     padding: calc(16px + env(safe-area-inset-top, 0px))
              calc(16px + env(safe-area-inset-right, 0px))
              calc(20px + env(safe-area-inset-bottom, 0px))
              calc(16px + env(safe-area-inset-left, 0px));
 }
-.radio-device {
-    width: min(100%, 400px);
+
+.ios-radio-container {
+    width: min(100%, 390px);
+    background: #ffffff;
+    border-radius: 36px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
+    padding: 24px 20px 28px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    padding: 18px;
-    border-radius: 28px;
-    background: linear-gradient(170deg, #14291f 0%, #0b1c15 55%, #07130e 100%);
-    border: 1px solid rgba(255, 255, 255, .08);
-    box-shadow: 0 24px 60px rgba(0, 0, 0, .55), inset 0 1px 0 rgba(255, 255, 255, .06);
+    gap: 18px;
+    position: relative;
+    overflow: hidden;
 }
-.radio-topbar {
+
+@media (max-width: 440px) {
+    .ios-radio-container {
+        border-radius: 28px;
+        padding: 20px 16px 24px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    }
+}
+
+/* Top bar: Brand + Status */
+.ios-radio-top {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
 }
-.radio-brand-word {
-    font-weight: 800;
-    font-size: 1.05rem;
-    letter-spacing: .02em;
-    color: var(--text);
-}
-.radio-onair {
+
+.ios-brand-badge {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: .66rem;
-    font-weight: 800;
-    letter-spacing: .1em;
-    color: #ff8d80;
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: #8e8e93;
 }
-.radio-onair-dot {
+
+.ios-live-indicator {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #ff3b30;
-    animation: radio-live 1.5s ease-out infinite;
+    background: #d1d1d6;
+    transition: background 0.3s ease;
 }
-@keyframes radio-live {
-    0% { box-shadow: 0 0 0 0 rgba(255, 59, 48, .55); }
-    100% { box-shadow: 0 0 0 7px rgba(255, 59, 48, 0); }
+
+.ios-live-indicator.active {
+    background: #34c759;
+    box-shadow: 0 0 0 3px rgba(52, 199, 89, 0.25);
+    animation: livePulse 1.8s infinite;
 }
-.radio-display {
+
+@keyframes livePulse {
+    0%, 100% { box-shadow: 0 0 0 2px rgba(52, 199, 89, 0.2); }
+    50% { box-shadow: 0 0 0 6px rgba(52, 199, 89, 0); }
+}
+
+.ios-status-pill {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 12px;
+    background: #f2f2f7;
+    color: #8e8e93;
+}
+
+.ios-status-pill.live {
+    background: rgba(52, 199, 89, 0.12);
+    color: #248a3d;
+}
+
+.ios-status-pill.buffering {
+    background: rgba(var(--accent-rgb), 0.12);
+    color: var(--brand-red-bright);
+    animation: pulse 1s infinite;
+}
+
+.ios-status-pill.external {
+    background: #f2f2f7;
+    color: #636366;
+}
+
+/* Station Display: Frequency + Title + Other Stations */
+.ios-station-display {
+    text-align: center;
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    padding: 18px 16px;
-    border-radius: 16px;
-    background: radial-gradient(120% 160% at 50% 0%, #0f2b1d 0%, #04120b 70%);
-    border: 1px solid rgba(0, 0, 0, .6);
-    box-shadow: inset 0 2px 10px rgba(0, 0, 0, .7);
-    text-align: center;
+    align-items: center;
 }
-.radio-dial {
-    font-family: "Courier New", ui-monospace, monospace;
-    font-size: clamp(2.2rem, 12vw, 3rem);
-    font-weight: 700;
-    letter-spacing: .04em;
-    color: #5fe6a0;
-    text-shadow: 0 0 12px rgba(95, 230, 160, .6);
+
+.ios-frequency-wrap {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
     line-height: 1;
+    margin-top: 2px;
 }
-.radio-now {
+
+.ios-frequency-val {
+    font-size: clamp(3.6rem, 15vw, 4.6rem);
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    color: #1c1c1e;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+}
+
+.ios-frequency-unit {
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: #48484a;
+    margin-left: 6px;
+    letter-spacing: 0.02em;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+}
+
+.ios-station-title {
+    font-size: 1.45rem;
+    font-weight: 600;
+    color: #3a3a3c;
+    margin: 8px 0 6px;
+}
+
+.ios-other-stations-btn {
+    background: none;
+    border: none;
+    color: var(--brand-red-bright);
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 12px;
+    border-radius: 8px;
+    transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.ios-other-stations-btn:hover {
+    opacity: 0.8;
+    transform: translateY(-1px);
+}
+
+.ios-other-stations-btn:active {
+    transform: translateY(0);
+}
+
+/* Middle Toolbar: [...], [Station List], [Share] */
+.ios-toolbar {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 14px;
+    gap: 36px;
+    margin: 2px 0 4px;
 }
-.radio-now-logo {
-    width: 60px;
-    height: 60px;
-    padding: 8px;
-    background: #fff;
-    border-radius: 12px;
-    object-fit: contain;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, .5);
-}
-.radio-now-meta {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    text-align: right;
-    min-width: 0;
-}
-.radio-now-name {
-    font-size: 1.25rem;
-    font-weight: 800;
-    color: var(--text);
-}
-.radio-now-desc {
-    color: var(--text-dim);
-    font-size: .85rem;
-    line-height: 1.5;
-}
-.radio-tuner {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 0 4px;
-}
-.radio-tuner-labels {
-    display: flex;
-    justify-content: space-between;
-    color: var(--text-dim);
-    font-size: .72rem;
-    font-weight: 700;
-    padding: 0 8px;
-}
-.radio-tuner-labels span {
-    transition: color .2s ease;
-}
-.radio-tuner-labels span.on {
-    color: #5fe6a0;
-}
-.radio-roller {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 100%;
-    height: 10px;
-    border-radius: 6px;
-    background: linear-gradient(90deg, #0a1711, #12281d);
-    outline: none;
+
+.ios-tool-btn {
+    background: none;
+    border: none;
+    color: var(--brand-red-bright);
     cursor: pointer;
-    border: 1px solid rgba(0, 0, 0, .55);
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, .8);
-}
-.radio-roller::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 30px;
-    height: 30px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
-    background: radial-gradient(circle at 32% 28%, #f4d998, #b98a3e 60%, #7a541f);
-    border: 1px solid rgba(0, 0, 0, .4);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(255, 255, 255, .45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: transform 0.15s ease, background 0.15s ease;
 }
-.radio-roller::-moz-range-thumb {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 32% 28%, #f4d998, #b98a3e 60%, #7a541f);
-    border: 1px solid rgba(0, 0, 0, .4);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(255, 255, 255, .45);
-}
-.radio-roller:active::-webkit-slider-thumb {
+
+.ios-tool-btn:hover {
+    background: rgba(var(--accent-rgb), 0.08);
     transform: scale(1.08);
 }
-.radio-listen {
+
+.ios-tool-btn:active {
+    transform: scale(0.94);
+}
+
+/* FM Frequency Tuner Scale */
+.ios-tuner-section {
+    position: relative;
+    margin: 4px -20px;
+    overflow: hidden;
+}
+
+.ios-tuner-viewport {
+    height: 76px;
+    background: #efeff4;
+    border-top: 1px solid #dcdce0;
+    border-bottom: 1px solid #dcdce0;
+    position: relative;
+    overflow: hidden;
+}
+
+.ios-tuner-needle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 3px;
+    margin-left: -1.5px;
+    background: var(--brand-red-bright);
+    z-index: 10;
+    pointer-events: none;
+    border-radius: 1px;
+}
+
+.ios-tuner-track {
+    height: 100%;
+    display: flex;
+    align-items: flex-start;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
+}
+
+.ios-tuner-unit {
+    width: 70px;
+    flex-shrink: 0;
+    height: 100%;
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+}
+
+.ios-tuner-unit.station-mark .ios-tuner-num {
+    color: #1c1c1e;
+    font-weight: 700;
+}
+
+.ios-tuner-mark {
+    background: #8e8e93;
+    border-radius: 1px;
+    position: absolute;
+}
+
+.ios-tuner-mark.major {
+    top: 0;
+    left: 0;
+    width: 1.5px;
+    height: 26px;
+}
+
+.ios-tuner-mark.med {
+    top: 0;
+    width: 1.5px;
+    height: 16px;
+}
+
+.ios-tuner-mark.minor {
+    top: 0;
+    width: 1px;
+    height: 10px;
+    background: #c7c7cc;
+}
+
+.ios-tuner-num {
+    position: absolute;
+    top: 30px;
+    left: 3px;
+    font-size: 11px;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", monospace;
+    color: #8e8e93;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.ios-tuner-subticks {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.ios-tuner-subticks .ios-tuner-mark:nth-child(1) { left: 20%; }
+.ios-tuner-subticks .ios-tuner-mark:nth-child(2) { left: 40%; }
+.ios-tuner-subticks .ios-tuner-mark:nth-child(3) { left: 60%; }
+.ios-tuner-subticks .ios-tuner-mark:nth-child(4) { left: 80%; }
+
+.ios-tuner-slider {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: ew-resize;
+    z-index: 15;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+/* Audio Player Controls */
+.ios-controls-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin-top: 2px;
+}
+
+.ios-playback-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    width: 100%;
+}
+
+.ios-step-btn {
+    background: none;
+    border: none;
+    color: #1c1c1e;
+    cursor: pointer;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.ios-step-btn:hover {
+    opacity: 0.75;
+    transform: scale(1.08);
+}
+
+.ios-step-btn:active {
+    transform: scale(0.92);
+}
+
+.ios-play-btn {
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background: #1c1c1e;
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+}
+
+.ios-play-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+}
+
+.ios-play-btn:active {
+    transform: scale(0.96);
+}
+
+.ios-play-btn.external {
+    background: var(--brand-red-bright);
+    box-shadow: 0 6px 20px rgba(var(--accent-rgb), 0.35);
+}
+
+.ios-play-btn.playing {
+    box-shadow: 0 0 0 6px rgba(var(--accent-rgb), 0.15), 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.ios-external-hint {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #8e8e93;
+    text-align: center;
+    margin-top: -6px;
+}
+
+/* Volume Control Bar */
+.ios-volume-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 88%;
+    max-width: 300px;
+    color: #8e8e93;
+    margin-top: 4px;
+}
+
+.ios-vol-icon {
+    flex-shrink: 0;
+    color: #8e8e93;
+}
+
+.ios-volume-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    border-radius: 2px;
+    background: #e5e5ea;
+    outline: none;
+    cursor: pointer;
+}
+
+.ios-volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22), 0 0 1px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.ios-volume-slider::-webkit-slider-thumb:active {
+    transform: scale(1.15);
+}
+
+.ios-volume-slider::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+    cursor: pointer;
+}
+
+/* Stations Bottom Sheet Modal */
+.ios-sheet-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 120;
+    background: rgba(0, 0, 0, 0.42);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.ios-stations-sheet {
+    width: min(100%, 460px);
+    background: #ffffff;
+    border-radius: 28px 28px 0 0;
+    padding: 12px 20px 32px;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15);
+    max-height: 80vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ios-sheet-grabber {
+    width: 36px;
+    height: 5px;
+    border-radius: 3px;
+    background: #d1d1d6;
+    margin: 4px auto 14px;
+}
+
+.ios-sheet-title-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
-    padding: 15px 18px;
-    border-radius: 14px;
-    background: linear-gradient(145deg, var(--brand-red-bright), var(--brand-red-dark));
-    color: #fff;
-    font-weight: 800;
-    font-size: 1.05rem;
-    text-decoration: none;
-    box-shadow: 0 8px 22px rgba(var(--accent-rgb), .35);
-    transition: transform .15s ease, filter .15s ease;
+    margin-bottom: 16px;
 }
-.radio-listen:hover { filter: brightness(1.08); transform: translateY(-1px); }
-.radio-listen-arrow { font-size: .9rem; }
-.radio-about-link {
-    align-self: center;
-    color: var(--text-dim);
-    font-size: .85rem;
+
+.ios-sheet-title-row h2 {
+    margin: 0;
+    font-size: 1.25rem;
     font-weight: 700;
-    text-decoration: none;
-    padding: 2px 8px;
+    color: var(--text);
 }
-.radio-about-link:hover { color: var(--text); }
+
+.ios-sheet-close {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #f2f2f7;
+    border: none;
+    color: #8e8e93;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    transition: background 0.15s ease;
+}
+
+.ios-sheet-close:hover {
+    background: #e5e5ea;
+}
+
+.ios-stations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ios-station-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: #f8f9fa;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+
+.ios-station-item:hover {
+    background: #f2f2f7;
+    border-color: rgba(var(--accent-rgb), 0.3);
+}
+
+.ios-station-item.active {
+    background: rgba(var(--accent-rgb), 0.06);
+    border-color: var(--brand-red-bright);
+}
+
+.ios-station-item-logo {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    object-fit: contain;
+    background: #ffffff;
+    padding: 4px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    flex-shrink: 0;
+}
+
+.ios-station-item-info {
+    flex: 1;
+    text-align: right;
+}
+
+.ios-station-item-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ios-station-item-name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1c1c1e;
+}
+
+.ios-station-item-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 6px;
+    background: #e5e5ea;
+    color: #636366;
+}
+
+.ios-station-item-desc {
+    font-size: 0.8rem;
+    color: #8e8e93;
+    display: block;
+    margin-top: 2px;
+}
+
+.ios-item-btn {
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 10px;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.ios-item-btn.live {
+    background: var(--brand-red-bright);
+    color: white;
+}
+
+.ios-item-btn.external {
+    background: #e5e5ea;
+    color: #1c1c1e;
+}
+
+/* Toast Notification */
+.ios-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 150;
+    background: #1c1c1e;
+    color: #ffffff;
+    padding: 10px 18px;
+    border-radius: 30px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    animation: toastUp 0.25s ease-out;
+}
+
+.ios-toast-wa-btn {
+    background: #25d366;
+    color: white;
+    text-decoration: none;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes toastUp {
+    from { transform: translate(-50%, 20px); opacity: 0; }
+    to { transform: translate(-50%, 0); opacity: 1; }
+}
+

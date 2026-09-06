@@ -60,8 +60,35 @@ export function setVolume(value) {
     audioEl.volume = Math.min(1, Math.max(0, value));
 }
 
+export async function shareStation(title, text, url) {
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: title,
+                text: text,
+                url: url
+            });
+            return { success: true, method: "native" };
+        } catch (err) {
+            if (err.name === "AbortError") {
+                return { success: true, method: "aborted" };
+            }
+        }
+    }
+
+    try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(`${text} ${url}`);
+            return { success: true, method: "clipboard" };
+        }
+    } catch (e) { }
+
+    return { success: false, method: "none" };
+}
+
 export function dispose() {
     clearSource();
     audioEl = null;
     dotNetRef = null;
 }
+

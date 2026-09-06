@@ -2,54 +2,258 @@
 @implements IAsyncDisposable
 @inject IJSRuntime JS
 
-<PageTitle>محطات الراديو السورية - البث المباشر</PageTitle>
+<PageTitle>راديو سوريا - البث المباشر</PageTitle>
 
-<main class="radio-app" lang="ar" dir="rtl">
-    <div class="radio-device">
-        <!-- Top: brand + on-air status -->
-        <header class="radio-topbar">
-            <span class="radio-brand-word">راديو سوريا</span>
-            <span class="radio-onair"><span class="radio-onair-dot"></span>ON AIR</span>
+<main class="ios-radio-screen" lang="ar" dir="rtl">
+    <div class="ios-radio-container">
+        <!-- Top spacer / subtle indicator -->
+        <header class="ios-radio-top">
+            <div class="ios-brand-badge">
+                <span class="ios-live-indicator @(CurrentStation.IsLiveStream && isPlaying ? "active" : "")"></span>
+                <span>راديو سوريا</span>
+            </div>
+            @if (CurrentStation.IsLiveStream)
+            {
+                <span class="ios-status-pill @statusClass">@statusText</span>
+            }
+            else
+            {
+                <span class="ios-status-pill external">محطة خارجية</span>
+            }
         </header>
 
-        <!-- Display: station frequency + logo -->
-        <div class="radio-display">
-            <div class="radio-dial">@Stations[Current].Dial</div>
-            <div class="radio-now">
-                <img class="radio-now-logo" src="@Stations[Current].Logo" alt="شعار @Stations[Current].Name" />
-                <div class="radio-now-meta">
-                    <strong class="radio-now-name">@Stations[Current].Name</strong>
-                    <span class="radio-now-desc">@Stations[Current].Description</span>
+        <!-- Main Display: Frequency + Station Name -->
+        <section class="ios-station-display">
+            <div class="ios-frequency-wrap" dir="ltr">
+                <span class="ios-frequency-val">@CurrentStation.DialFrequency</span>
+                <span class="ios-frequency-unit">@CurrentStation.DialUnit</span>
+            </div>
+
+            <h1 class="ios-station-title">@CurrentStation.Name</h1>
+
+            <button type="button" class="ios-other-stations-btn" @onclick="ToggleStationsSheet">
+                محطات أخرى
+            </button>
+        </section>
+
+        <!-- Middle Action Bar: [...], [Stations List], [Share] -->
+        <nav class="ios-toolbar" aria-label="أدوات الراديو">
+            <a href="/about" class="ios-tool-btn" title="عن التطبيق" aria-label="عن التطبيق">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                    <circle cx="5" cy="12" r="2" />
+                    <circle cx="12" cy="12" r="2" />
+                    <circle cx="19" cy="12" r="2" />
+                </svg>
+            </a>
+
+            <button type="button" class="ios-tool-btn" @onclick="ToggleStationsSheet" title="قائمة المحطات" aria-label="قائمة المحطات">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="10" y1="6" x2="21" y2="6" />
+                    <line x1="10" y1="12" x2="21" y2="12" />
+                    <line x1="10" y1="18" x2="21" y2="18" />
+                    <polygon points="5,4 5.9,6.2 8.3,6.2 6.4,7.6 7.1,9.8 5.2,8.4 3.3,9.8 4,7.6 2.1,6.2 4.5,6.2" fill="currentColor" stroke="none" />
+                    <polygon points="5,10 5.9,12.2 8.3,12.2 6.4,13.6 7.1,15.8 5.2,14.4 3.3,15.8 4,13.6 2.1,12.2 4.5,12.2" fill="currentColor" stroke="none" />
+                    <polygon points="5,16 5.9,18.2 8.3,18.2 6.4,19.6 7.1,21.8 5.2,20.4 3.3,21.8 4,19.6 2.1,18.2 4.5,18.2" fill="currentColor" stroke="none" />
+                </svg>
+            </button>
+
+            <button type="button" class="ios-tool-btn" @onclick="OnShareClicked" title="مشاركة التطبيق" aria-label="مشاركة التطبيق">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                    <polyline points="16 6 12 2 8 6" />
+                    <line x1="12" y1="2" x2="12" y2="15" />
+                </svg>
+            </button>
+        </nav>
+
+        <!-- FM Frequency Tuner Scale -->
+        <section class="ios-tuner-section">
+            <div class="ios-tuner-viewport">
+                <!-- Center Red Needle Indicator -->
+                <div class="ios-tuner-needle" aria-hidden="true"></div>
+
+                <!-- Tuner Scale Track -->
+                <div class="ios-tuner-track" style="transform: translateX(calc(50% + @(TunerOffsetPx)px));" dir="ltr">
+                    @for (int mhz = 86; mhz <= 106; mhz++)
+                    {
+                        var freqVal = mhz;
+                        var isStationNear = Stations.Any(s => Math.Abs(s.Frequency - freqVal) < 0.2);
+                        <div class="ios-tuner-unit @(isStationNear ? "station-mark" : "")" @onclick="() => TuneToMhz(freqVal)">
+                            <div class="ios-tuner-mark major"></div>
+                            <span class="ios-tuner-num">@freqVal</span>
+                            <div class="ios-tuner-subticks">
+                                <div class="ios-tuner-mark minor"></div>
+                                <div class="ios-tuner-mark minor"></div>
+                                <div class="ios-tuner-mark med"></div>
+                                <div class="ios-tuner-mark minor"></div>
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
-        </div>
 
-        <!-- Tuning roller: slide to change the channel -->
-        <div class="radio-tuner">
-            <div class="radio-tuner-labels">
-                @foreach (var s in Stations)
+            <!-- Invisible range input for effortless slider/touch scrubbing -->
+            <input type="range"
+                   class="ios-tuner-slider"
+                   min="0"
+                   max="@(Stations.Count - 1)"
+                   step="1"
+                   value="@currentIndex"
+                   aria-label="ضبط التردد"
+                   @oninput="OnSliderInput" />
+        </section>
+
+        <!-- Audio Player Controls -->
+        <section class="ios-controls-section">
+            <div class="ios-playback-row">
+                <!-- Previous Station -->
+                <button type="button" class="ios-step-btn" @onclick="PrevStation" aria-label="المحطة السابقة">
+                    <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+                        <polygon points="11,18 2,12 11,6" />
+                        <polygon points="22,18 13,12 22,6" />
+                    </svg>
+                </button>
+
+                <!-- Big Play/Pause / Launch Button -->
+                @if (CurrentStation.IsLiveStream)
                 {
-                    <span class="@(s == Stations[Current] ? "on" : "")">@s.ShortLabel</span>
+                    <button type="button"
+                            class="ios-play-btn @(isPlaying ? "playing" : "")"
+                            @onclick="TogglePlay"
+                            aria-label="@(isPlaying ? "إيقاف مؤقت" : "تشغيل نينار FM")">
+                        @if (isPlaying)
+                        {
+                            <!-- Pause Bars -->
+                            <svg viewBox="0 0 24 24" width="34" height="34" fill="currentColor">
+                                <rect x="6" y="4" width="4" height="16" rx="1.5" />
+                                <rect x="14" y="4" width="4" height="16" rx="1.5" />
+                            </svg>
+                        }
+                        else
+                        {
+                            <!-- Play Triangle -->
+                            <svg viewBox="0 0 24 24" width="34" height="34" fill="currentColor" style="transform: translateX(-1px);">
+                                <polygon points="7,4 20,12 7,20" />
+                            </svg>
+                        }
+                    </button>
                 }
+                else
+                {
+                    <button type="button"
+                            class="ios-play-btn external"
+                            @onclick="OpenExternalStation"
+                            aria-label="فتح البث الرسمي لـ @CurrentStation.Name">
+                        <!-- External Link / Launch Icon -->
+                        <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                            <polyline points="15 3 21 3 21 9" />
+                            <line x1="10" y1="14" x2="21" y2="3" />
+                        </svg>
+                    </button>
+                }
+
+                <!-- Next Station -->
+                <button type="button" class="ios-step-btn" @onclick="NextStation" aria-label="المحطة التالية">
+                    <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+                        <polygon points="13,18 22,12 13,6" />
+                        <polygon points="2,18 11,12 2,6" />
+                    </svg>
+                </button>
             </div>
-            <input class="radio-roller"
-                   type="range"
-                   min="0" max="@(Stations.Count - 1)" step="1"
-                   value="@Current"
-                   aria-label="ضبط المحطة"
-                   @oninput="OnTune" />
-        </div>
 
-        <!-- Action -->
-        <a class="radio-listen" href="@Stations[Current].Href" dir="rtl">
-            <span>@Stations[Current].ActionText</span>
-            <span class="radio-listen-arrow" aria-hidden="true">◀</span>
-        </a>
+            @if (!CurrentStation.IsLiveStream)
+            {
+                <div class="ios-external-hint">
+                    اضغط للفتح على الموقع الرسمي لـ @CurrentStation.Name
+                </div>
+            }
 
-        <a class="radio-about-link" href="/about">عن التطبيق</a>
+            <!-- Volume Control Bar -->
+            <div class="ios-volume-container" dir="ltr">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ios-vol-icon min">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                </svg>
+
+                <input type="range"
+                       class="ios-volume-slider"
+                       min="0"
+                       max="100"
+                       value="@volume"
+                       aria-label="مستوى الصوت"
+                       @oninput="OnVolumeChanged" />
+
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ios-vol-icon max">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                </svg>
+            </div>
+        </section>
     </div>
+
+    <!-- Hidden audio element for in-page live playback -->
+    <audio id="@audioElementId" preload="none"></audio>
 </main>
 
+<!-- Bottom Sheet: Stations Drawer -->
+@if (showStationsSheet)
+{
+    <div class="ios-sheet-backdrop" @onclick="ToggleStationsSheet" role="presentation">
+        <section class="ios-stations-sheet" role="dialog" aria-modal="true" aria-labelledby="stations-sheet-title" @onclick:stopPropagation>
+            <header class="ios-sheet-header">
+                <div class="ios-sheet-grabber"></div>
+                <div class="ios-sheet-title-row">
+                    <h2 id="stations-sheet-title">محطات الراديو</h2>
+                    <button type="button" class="ios-sheet-close" @onclick="ToggleStationsSheet" aria-label="إغلاق">✕</button>
+                </div>
+            </header>
+
+            <div class="ios-stations-list">
+                @for (int i = 0; i < Stations.Count; i++)
+                {
+                    var idx = i;
+                    var st = Stations[idx];
+                    var isCurrent = idx == currentIndex;
+
+                    <div class="ios-station-item @(isCurrent ? "active" : "")" @onclick="() => SelectStationFromSheet(idx)">
+                        <img src="@st.Logo" alt="@st.Name" class="ios-station-item-logo" />
+                        <div class="ios-station-item-info">
+                            <div class="ios-station-item-title-row">
+                                <strong class="ios-station-item-name">@st.Name</strong>
+                                <span class="ios-station-item-badge">@st.Dial</span>
+                            </div>
+                            <span class="ios-station-item-desc">@st.Description</span>
+                        </div>
+                        <div class="ios-station-item-action">
+                            @if (st.IsLiveStream)
+                            {
+                                <span class="ios-item-btn live">استمع الآن</span>
+                            }
+                            else
+                            {
+                                <span class="ios-item-btn external">فتح الموقع ↗</span>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+    </div>
+}
+
+<!-- Share Toast Feedback -->
+@if (!string.IsNullOrEmpty(shareToastMessage))
+{
+    <div class="ios-toast" role="alert">
+        <span>@shareToastMessage</span>
+        <a class="ios-toast-wa-btn" href="@whatsappShareUrl" target="_blank" rel="noopener noreferrer">
+            مشاركة في واتساب 💬
+        </a>
+    </div>
+}
+
+<!-- iOS Add-to-Home First Visit Modal -->
 @if (showIosOnboarding)
 {
     <div class="ios-onboarding-backdrop" role="presentation">
@@ -68,33 +272,109 @@
 
 @code {
     private sealed record Station(
+        string Id,
         string Name,
         string ShortLabel,
+        string DialFrequency,
+        string DialUnit,
         string Dial,
+        double Frequency,
         string Description,
-        string ActionText,
         string Logo,
-        string Href);
+        string Href,
+        string StreamUrl,
+        bool UseProxy,
+        bool IsLiveStream);
 
-    // NOTE: FM frequencies below are approximate/illustrative dial labels.
     private List<Station> Stations { get; } =
     [
-        new Station("نينار FM", "نينار", "89.6 FM", "البث المباشر من سوريا", "استمع الآن", "img/ninar-logo.png", "/ninar-fm"),
-        new Station("شام FM", "شام", "92.3 FM", "أغانٍ وأخبار من دمشق", "فتح البث", "img/sham-fm-logo.png", "http://radio.sham.fm/"),
-        new Station("إذاعة دمشق", "دمشق", "95.0 FM", "البث الرسمي من دمشق", "استمع الآن", "img/radio-damascus-logo.svg", "https://damasradio.fm/"),
-        new Station("راديو سوريا", "سوريا", "WEB", "البث المباشر لقناة سوريا", "فتح البث", "img/syria-tv.png", "https://www.syria.tv/%D8%B1%D8%A7%D8%AF%D9%8A%D9%88-%D8%B3%D9%88%D8%B1%D9%8A%D8%A7")
+        new Station(
+            "ninar",
+            "نينار FM",
+            "نينار",
+            "89,6",
+            "FM",
+            "89.6 FM",
+            89.6,
+            "البث المباشر من سوريا",
+            "img/ninar-logo.png",
+            "/ninar-fm",
+            "http://ninarfm.grtvstream.com:8896/",
+            true,
+            true),
+
+        new Station(
+            "sham",
+            "شام FM",
+            "شام",
+            "92,3",
+            "FM",
+            "92.3 FM",
+            92.3,
+            "أغانٍ وأخبار من دمشق",
+            "img/sham-fm-logo.png",
+            "http://radio.sham.fm/",
+            "",
+            false,
+            false),
+
+        new Station(
+            "damascus",
+            "إذاعة دمشق",
+            "دمشق",
+            "95,0",
+            "FM",
+            "95.0 FM",
+            95.0,
+            "البث الرسمي من دمشق",
+            "img/radio-damascus-logo.svg",
+            "https://damasradio.fm/",
+            "",
+            false,
+            false),
+
+        new Station(
+            "syria-tv",
+            "راديو سوريا",
+            "سوريا",
+            "WEB",
+            "LIVE",
+            "WEB",
+            102.0,
+            "البث المباشر لقناة سوريا",
+            "img/syria-tv.png",
+            "https://www.syria.tv/%D8%B1%D8%A7%D8%AF%D9%8A%D9%88-%D8%B3%D9%88%D8%B1%D9%8A%D8%A7",
+            "",
+            false,
+            false)
     ];
 
-    private int Current { get; set; }
+    private int currentIndex = 0;
+    private Station CurrentStation => Stations[currentIndex];
 
-    private void OnTune(ChangeEventArgs e)
-    {
-        if (int.TryParse(e.Value?.ToString(), out var index))
-        {
-            Current = Math.Clamp(index, 0, Stations.Count - 1);
-        }
-    }
+    // Tuner ruler offset: each 1 MHz = 70px. Scale starts at 86 MHz.
+    // When Frequency is F, offset is -((F - 86) * 70)
+    // Combined with calc(50% + offset) in CSS to center directly under needle
+    private const double PxPerMhz = 70.0;
+    private const double BaseMhz = 86.0;
+    private double TunerOffsetPx => -((CurrentStation.Frequency - BaseMhz) * PxPerMhz);
 
+    // Audio Player State
+    private readonly string audioElementId = "syrian-radio-audio-" + Guid.NewGuid().ToString("N");
+    private IJSObjectReference? playerModule;
+    private DotNetObjectReference<Index>? dotNetRef;
+    private bool isPlaying;
+    private int volume = 80;
+    private string statusClass = "idle";
+    private string statusText = "جاهز";
+
+    // Sheets and Modals
+    private bool showStationsSheet;
+    private string? shareToastMessage;
+    private string whatsappShareUrl = "";
+    private System.Threading.Timer? toastTimer;
+
+    // iOS Onboarding
     private IJSObjectReference? onboardingModule;
     private bool showIosOnboarding;
 
@@ -102,19 +382,216 @@
     {
         if (!firstRender) return;
 
-        onboardingModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/iosOnboarding.js");
-        showIosOnboarding = await onboardingModule.InvokeAsync<bool>("claimFirstVisit");
-
-        if (showIosOnboarding)
+        try
         {
-            StateHasChanged();
+            playerModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/radioPlayer.js");
+            dotNetRef = DotNetObjectReference.Create(this);
+            await playerModule.InvokeVoidAsync("init", audioElementId, dotNetRef);
+            await playerModule.InvokeVoidAsync("setVolume", volume / 100.0);
         }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error initializing radio player: " + ex.Message);
+        }
+
+        try
+        {
+            onboardingModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/iosOnboarding.js");
+            showIosOnboarding = await onboardingModule.InvokeAsync<bool>("claimFirstVisit");
+            if (showIosOnboarding) StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error checking onboarding: " + ex.Message);
+        }
+    }
+
+    private async Task TogglePlay()
+    {
+        if (playerModule is null || !CurrentStation.IsLiveStream) return;
+
+        if (isPlaying)
+        {
+            await playerModule.InvokeVoidAsync("pause");
+            isPlaying = false;
+            SetStatus("paused", "متوقف مؤقتاً");
+        }
+        else
+        {
+            SetStatus("buffering", "جارٍ الاتصال...");
+            isPlaying = true;
+            await playerModule.InvokeVoidAsync("play", CurrentStation.StreamUrl, CurrentStation.UseProxy);
+        }
+    }
+
+    private async Task OpenExternalStation()
+    {
+        if (string.IsNullOrEmpty(CurrentStation.Href)) return;
+        await JS.InvokeVoidAsync("open", CurrentStation.Href, "_blank");
+    }
+
+    private async Task OnVolumeChanged(ChangeEventArgs e)
+    {
+        if (playerModule is null) return;
+        if (int.TryParse(e.Value?.ToString(), out var v))
+        {
+            volume = v;
+            await playerModule.InvokeVoidAsync("setVolume", volume / 100.0);
+        }
+    }
+
+    [JSInvokable]
+    public void OnStatusChanged(string status)
+    {
+        switch (status)
+        {
+            case "live":
+                isPlaying = true;
+                SetStatus("live", "على الهواء");
+                break;
+            case "buffering":
+                SetStatus("buffering", "جارٍ التحميل...");
+                break;
+            case "paused":
+                isPlaying = false;
+                SetStatus("paused", "متوقف");
+                break;
+            case "error":
+                isPlaying = false;
+                SetStatus("error", "انقطع البث");
+                break;
+        }
+        StateHasChanged();
+    }
+
+    private void SetStatus(string cls, string text)
+    {
+        statusClass = cls;
+        statusText = text;
+    }
+
+    private void PrevStation()
+    {
+        var prev = currentIndex - 1;
+        if (prev < 0) prev = Stations.Count - 1;
+        ChangeStation(prev);
+    }
+
+    private void NextStation()
+    {
+        var next = (currentIndex + 1) % Stations.Count;
+        ChangeStation(next);
+    }
+
+    private void OnSliderInput(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var idx))
+        {
+            ChangeStation(Math.Clamp(idx, 0, Stations.Count - 1));
+        }
+    }
+
+    private void TuneToMhz(int mhz)
+    {
+        var closestIdx = 0;
+        var minDiff = double.MaxValue;
+        for (int i = 0; i < Stations.Count; i++)
+        {
+            var diff = Math.Abs(Stations[i].Frequency - mhz);
+            if (diff < minDiff)
+            {
+                minDiff = diff;
+                closestIdx = i;
+            }
+        }
+        ChangeStation(closestIdx);
+    }
+
+    private void ChangeStation(int newIndex)
+    {
+        if (newIndex == currentIndex) return;
+
+        // If changing away from Ninar while playing, pause stream
+        if (CurrentStation.IsLiveStream && isPlaying && !Stations[newIndex].IsLiveStream)
+        {
+            _ = playerModule?.InvokeVoidAsync("pause");
+            isPlaying = false;
+            SetStatus("idle", "جاهز");
+        }
+
+        currentIndex = newIndex;
+        StateHasChanged();
+    }
+
+    private void ToggleStationsSheet()
+    {
+        showStationsSheet = !showStationsSheet;
+    }
+
+    private void SelectStationFromSheet(int index)
+    {
+        showStationsSheet = false;
+        ChangeStation(index);
+    }
+
+    private sealed record ShareResult(bool Success, string Method);
+
+    private async Task OnShareClicked()
+    {
+        var shareText = $"اسمع هالمحطة معي: {CurrentStation.Name}";
+        var shareUrl = "https://syrian-radio.pages.dev/";
+        var shareTitle = $"{CurrentStation.Name} - راديو سوريا";
+
+        whatsappShareUrl = $"https://api.whatsapp.com/send?text={Uri.EscapeDataString(shareText + " " + shareUrl)}";
+
+        if (playerModule is not null)
+        {
+            try
+            {
+                var res = await playerModule.InvokeAsync<ShareResult>("shareStation", shareTitle, shareText, shareUrl);
+                if (res.Success && res.Method == "clipboard")
+                {
+                    ShowToast("تم نسخ رابط المحطة للحافظة!");
+                }
+                else if (!res.Success)
+                {
+                    ShowToast("شارك عبر واتساب بنقرة واحدة:");
+                }
+            }
+            catch
+            {
+                ShowToast("شارك عبر واتساب بنقرة واحدة:");
+            }
+        }
+    }
+
+    private void ShowToast(string message)
+    {
+        shareToastMessage = message;
+        toastTimer?.Dispose();
+        toastTimer = new System.Threading.Timer(_ =>
+        {
+            shareToastMessage = null;
+            InvokeAsync(StateHasChanged);
+        }, null, 5000, System.Threading.Timeout.Infinite);
     }
 
     private void DismissIosOnboarding() => showIosOnboarding = false;
 
     public async ValueTask DisposeAsync()
     {
+        toastTimer?.Dispose();
+
+        if (playerModule is not null)
+        {
+            try
+            {
+                await playerModule.InvokeVoidAsync("dispose");
+                await playerModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException) { }
+        }
+
         if (onboardingModule is not null)
         {
             try
@@ -123,5 +600,7 @@
             }
             catch (JSDisconnectedException) { }
         }
+
+        dotNetRef?.Dispose();
     }
 }

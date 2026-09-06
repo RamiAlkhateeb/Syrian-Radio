@@ -4,60 +4,86 @@
 
 <main class="install-page" lang="ar" dir="rtl">
     <div class="install-header">
-        <a class="back-link" href="/">← كل المحطات</a>
+        <a class="back-link" href="/about">← عودة للمعلومات</a>
         <h1 class="install-title">إضافة التطبيق إلى الشاشة الرئيسية</h1>
         <p class="install-subtitle">استمع إلى محطاتك المفضلة بنقرة واحدة من شاشة هاتفك الرئيسية بدون الحاجة لفتح المتصفح في كل مرة.</p>
+
+        <!-- Platform Switcher Tabs -->
+        <div class="install-tabs" role="tablist" aria-label="اختر نوع جهازك">
+            <button type="button"
+                    class="install-tab-btn @(platform == "ios" ? "active" : "")"
+                    role="tab"
+                    aria-selected="@(platform == "ios")"
+                    @onclick='() => SetPlatform("ios")'>
+                <span class="tab-badge-icon">🍎</span>
+                <span>آيفون (Safari)</span>
+            </button>
+            <button type="button"
+                    class="install-tab-btn @(platform == "android" ? "active" : "")"
+                    role="tab"
+                    aria-selected="@(platform == "android")"
+                    @onclick='() => SetPlatform("android")'>
+                <span class="tab-badge-icon">🤖</span>
+                <span>أندرويد (Chrome)</span>
+            </button>
+        </div>
     </div>
 
     <div class="install-card">
         <div class="ios-carousel">
-            <p class="ios-carousel-progress">الخطوة <strong>@(Current + 1)</strong> من @Slides.Count</p>
+            <p class="ios-carousel-progress">الخطوة <strong>@(CurrentStep + 1)</strong> من @ActiveSlides.Count</p>
 
-            <div class="ios-carousel-track" style="transform: translateX(@(Current * -100)%);">
-                @foreach (var slide in Slides)
-                {
-                    <div class="ios-carousel-slide">
-                        <div class="ios-carousel-copy">
-                            <span class="ios-step-badge">@slide.Badge</span>
-                            <h2>@slide.Action</h2>
-                            <p>@slide.Description</p>
+            <!-- Clipping viewport that keeps slider strictly bounded -->
+            <div class="ios-carousel-viewport">
+                <div class="ios-carousel-track" style="transform: translateX(-@(CurrentStep * 100)%);">
+                    @foreach (var slide in ActiveSlides)
+                    {
+                        <div class="ios-carousel-slide">
+                            <div class="ios-carousel-copy">
+                                <span class="ios-step-badge">@slide.Badge</span>
+                                <h2>@slide.Action</h2>
+                                <p>@slide.Description</p>
+                            </div>
+                            <div class="ios-carousel-image-frame">
+                                <img class="ios-carousel-img" src="@slide.Image" alt="@slide.Alt" loading="eager" />
+                            </div>
                         </div>
-                        <div class="ios-carousel-image-frame">
-                            <img class="ios-carousel-img" src="@slide.Image" alt="@slide.Alt" loading="eager" />
-                        </div>
-                    </div>
-                }
+                    }
+                </div>
             </div>
 
+            <!-- Dots Indicator -->
             <div class="ios-carousel-dots" role="tablist" aria-label="خطوات التثبيت">
-                @for (var i = 0; i < Slides.Count; i++)
+                @for (var i = 0; i < ActiveSlides.Count; i++)
                 {
+                    var idx = i;
                     <button type="button"
-                            class="ios-carousel-dot @(i == Current ? "active" : "")"
-                            aria-label="الخطوة @(i + 1)"
-                            aria-selected="@(i == Current)"
+                            class="ios-carousel-dot @(idx == CurrentStep ? "active" : "")"
+                            aria-label="الخطوة @(idx + 1)"
+                            aria-selected="@(idx == CurrentStep)"
                             role="tab"
-                            @onclick="() => GoTo(i)"></button>
+                            @onclick="() => GoTo(idx)"></button>
                 }
             </div>
 
+            <!-- Actions row -->
             <div class="ios-carousel-actions">
-                @if (Current > 0)
+                @if (CurrentStep > 0)
                 {
-                    <button type="button" class="ios-nav-back" @onclick="GoBack">← السابق</button>
+                    <button type="button" class="ios-nav-back" @onclick="GoBack">السابق ←</button>
                 }
                 else
                 {
                     <span class="ios-nav-spacer"></span>
                 }
 
-                @if (Current < Slides.Count - 1)
+                @if (CurrentStep < ActiveSlides.Count - 1)
                 {
-                    <button type="button" class="ios-nav-next" @onclick="GoNext">التالي ←</button>
+                    <button type="button" class="ios-nav-next" @onclick="GoNext">التالي ◀</button>
                 }
                 else
                 {
-                    <a class="ios-nav-done" href="/">البدء الآن 🎧</a>
+                    <a class="ios-nav-done" href="/">ابدأ الاستماع الآن 🎧</a>
                 }
             </div>
         </div>
@@ -67,31 +93,73 @@
 @code {
     private sealed record Slide(string Badge, string Action, string Description, string Image, string Alt);
 
-    private List<Slide> Slides { get; } =
+    private string platform = "ios";
+    private int currentIosStep = 0;
+    private int currentAndroidStep = 0;
+
+    private int CurrentStep
+    {
+        get => platform == "ios" ? currentIosStep : currentAndroidStep;
+        set
+        {
+            if (platform == "ios") currentIosStep = value;
+            else currentAndroidStep = value;
+        }
+    }
+
+    private List<Slide> IosSlides { get; } =
     [
         new(
             "الخطوة 1",
-            "افتح الموقع وافتح قائمة المتصفح",
-            "على آيفون اضغط زر المشاركة (⎘)، وعلى أندرويد اضغط أيقونة النقاط الثلاث (⋮) في زاوية الشاشة.",
+            "افتح قائمة المشاركة في Safari",
+            "تأكد من فتح الموقع في متصفح Safari، ثم اضغط على زر المشاركة (Share ⎘) في أسفل شاشة المتصفح.",
             "img/step%201.jpg",
-            "فتح قائمة المتصفح لبدء التثبيت"),
+            "فتح قائمة المشاركة في Safari"),
         new(
             "الخطوة 2",
             "اختر «إضافة إلى الشاشة الرئيسية»",
-            "من القائمة اختر خيار «إضافة إلى الشاشة الرئيسية» أو «تثبيت التطبيق» (Add to Home screen).",
+            "اسحب قائمة المشاركة لأعلى واختر «إضافة إلى الشاشة الرئيسية» (Add to Home Screen ➕).",
             "img/step%202.jpg",
-            "اختيار إضافة التطبيق إلى الشاشة الرئيسية"),
+            "اختيار إضافة إلى الشاشة الرئيسية"),
         new(
             "الخطوة 3",
             "اضغط «إضافة» لتأكيد التثبيت",
-            "اضغط على زر «إضافة» أو «تثبيت»، وسيظهر رمز التطبيق مباشرة على شاشة هاتفك الرئيسية.",
+            "اضغط على زر «إضافة» (Add) في أعلى الزاوية، وسيظهر رمز التطبيق مباشرة على شاشة هاتفك الرئيسية.",
             "img/step%203.jpg",
             "تأكيد إضافة التطبيق إلى الشاشة الرئيسية")
     ];
 
-    private int Current { get; set; }
+    private List<Slide> AndroidSlides { get; } =
+    [
+        new(
+            "الخطوة 1",
+            "افتح قائمة المتصفح",
+            "في متصفح Google Chrome أو Samsung Internet، اضغط على زر القائمة (⋮ النقاط الثلاث) في أعلى أو أسفل الشاشة.",
+            "img/install-android.jpg",
+            "قائمة خيارات متصفح Chrome"),
+        new(
+            "الخطوة 2",
+            "اختر «تثبيت التطبيق»",
+            "من القائمة، اضغط على خيار «تثبيت التطبيق» (Install App) أو «إضافة إلى الشاشة الرئيسية» (Add to Home Screen).",
+            "img/install-android.jpg",
+            "اختيار خيار تثبيت التطبيق"),
+        new(
+            "الخطوة 3",
+            "تأكيد التثبيت على الشاشة الرئيسية",
+            "اضغط على «تثبيت» في النافذة المنبثقة، وسيتم إضافة تطبيق راديو سوريا إلى قائمة تطبيقاتك فوراً.",
+            "img/install-android.jpg",
+            "تأكيد إضافة التطبيق على أندرويد")
+    ];
 
-    private void GoBack() => GoTo(Current - 1);
-    private void GoNext() => GoTo(Current + 1);
-    private void GoTo(int index) => Current = Math.Clamp(index, 0, Slides.Count - 1);
+    private List<Slide> ActiveSlides => platform == "ios" ? IosSlides : AndroidSlides;
+
+    private void SetPlatform(string p)
+    {
+        platform = p;
+        CurrentStep = 0;
+    }
+
+    private void GoBack() => GoTo(CurrentStep - 1);
+    private void GoNext() => GoTo(CurrentStep + 1);
+    private void GoTo(int index) => CurrentStep = Math.Clamp(index, 0, ActiveSlides.Count - 1);
 }
