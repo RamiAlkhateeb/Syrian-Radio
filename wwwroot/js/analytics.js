@@ -23,7 +23,7 @@
 })();
 
 // Called by the Blazor app (App.razor) on every client-side navigation so that
-// SPA route changes (/, /about, /install, /ninar-fm) are tracked as page views.
+// SPA route changes (/, /about, /install) are tracked as page views.
 window.trackPageView = function (path) {
     if (!window.gtag) return;
     window.gtag("event", "page_view", { page_path: path });
