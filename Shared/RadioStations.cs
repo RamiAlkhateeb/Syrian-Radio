@@ -1,5 +1,6 @@
 namespace NinarFmPlayer.Shared;
 
+// EmbedUrl is the station's own page, shown in the app when it has no native stream or the native stream fails.
 public sealed record RadioStation(
     string Id,
     string Name,
@@ -13,7 +14,8 @@ public sealed record RadioStation(
     string Href,
     string StreamUrl,
     bool UseProxy,
-    bool IsLiveStream);
+    bool IsLiveStream,
+    string? EmbedUrl = null);
 
 /// <summary>The station list, shared by the player (Index) and the AI assistant.</summary>
 public static class RadioStations
@@ -43,12 +45,13 @@ public static class RadioStations
             "FM",
             "92.3 FM",
             92.3,
-            "أغانٍ وأخبار من دمشق",
+            "البث المباشر: أغانٍ وأخبار من دمشق",
             "img/sham-fm-logo.png",
-            "http://radio.sham.fm/",
-            "",
+            "https://sham.fm/",
+            "https://radioshamfm.grtvstream.com:8400/stream",
             false,
-            false),
+            true,
+            "https://sham.fm/"),
 
         new RadioStation(
             "damascus",
@@ -58,12 +61,13 @@ public static class RadioStations
             "FM",
             "95.0 FM",
             95.0,
-            "البث الرسمي من دمشق",
+            "البث المباشر من دمشق",
             "img/radio-damascus-logo.svg",
             "https://damasradio.fm/",
-            "",
+            "https://radiodamascus.ortas.live/RDimshq/RDimshqAudioLive/playlist.m3u8",
             false,
-            false),
+            true,
+            "https://damasradio.fm/"),
 
         new RadioStation(
             "syria-tv",

@@ -16,8 +16,43 @@ export function init(elementId, dotNetHelper) {
     audioEl.addEventListener("playing", () => dotNetRef.invokeMethodAsync("OnStatusChanged", "live"));
     audioEl.addEventListener("waiting", () => dotNetRef.invokeMethodAsync("OnStatusChanged", "buffering"));
     audioEl.addEventListener("pause", () => dotNetRef.invokeMethodAsync("OnStatusChanged", "paused"));
-    audioEl.addEventListener("error", () => dotNetRef.invokeMethodAsync("OnStatusChanged", "error"));
-    audioEl.addEventListener("stalled", () => dotNetRef.invokeMethodAsync("OnStatusChanged", "error"));
+    audioEl.addEventListener("playing", () => { retries = 0; });
+    audioEl.addEventListener("error", () => handleDrop());
+    audioEl.addEventListener("stalled", () => { if (audioEl.readyState < 3) handleDrop(); });
+}
+
+// Live streams drop now and then; retry quietly a few times before telling the UI.
+let wantPlaying = false;
+let currentSource = null;
+let retries = 0;
+let retryTimer = null;
+let hls = null;
+const MAX_RETRIES = 3;
+
+function handleDrop() {
+    if (!wantPlaying || !currentSource) return;
+    if (retries >= MAX_RETRIES) {
+        wantPlaying = false;
+        notifyStatus("error");
+        return;
+    }
+    retries++;
+    notifyStatus("buffering");
+    clearTimeout(retryTimer);
+    retryTimer = setTimeout(() => { if (wantPlaying) startNativePlayback(currentSource); }, 1500 * retries);
+}
+
+let hlsLoader = null;
+function loadHlsLib() {
+    if (globalThis.Hls) return Promise.resolve(globalThis.Hls);
+    hlsLoader ??= new Promise((resolve, reject) => {
+        const el = document.createElement("script");
+        el.src = "https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js";
+        el.onload = () => resolve(globalThis.Hls);
+        el.onerror = () => reject(new Error("hls.js failed to load"));
+        document.head.appendChild(el);
+    });
+    return hlsLoader;
 }
 
 function notifyStatus(status) {
@@ -26,6 +61,7 @@ function notifyStatus(status) {
 
 function clearSource() {
     if (!audioEl) return;
+    if (hls) { hls.destroy(); hls = null; }
     audioEl.pause();
     audioEl.removeAttribute("src");
     audioEl.load();
@@ -33,10 +69,25 @@ function clearSource() {
 
 function startNativePlayback(sourceUrl) {
     if (!audioEl) return;
+    if (hls) { hls.destroy(); hls = null; }
+
+    if (/\.m3u8(\?|$)/i.test(sourceUrl) && !audioEl.canPlayType("application/vnd.apple.mpegurl")) {
+        // Chrome/Firefox/Edge have no native HLS: use hls.js.
+        loadHlsLib().then((Hls) => {
+            if (!audioEl || currentSource !== sourceUrl || !wantPlaying) return;
+            if (!Hls.isSupported()) { handleDrop(); return; }
+            hls = new Hls();
+            hls.on(Hls.Events.ERROR, (_, data) => { if (data.fatal) handleDrop(); });
+            hls.loadSource(sourceUrl);
+            hls.attachMedia(audioEl);
+            audioEl.play().catch(() => notifyStatus("error"));
+        }).catch(() => handleDrop());
+        return;
+    }
 
     audioEl.src = sourceUrl;
     audioEl.load();
-    audioEl.play().catch(() => notifyStatus("error"));
+    audioEl.play().catch(() => handleDrop());
 }
 
 export function play(streamUrl, useNinarProxy) {
@@ -48,11 +99,29 @@ export function play(streamUrl, useNinarProxy) {
 
     clearSource();
 
+    wantPlaying = true;
+    retries = 0;
+    currentSource = sourceUrl;
     startNativePlayback(sourceUrl);
 }
 
 export function pause() {
+    wantPlaying = false;
+    clearTimeout(retryTimer);
     clearSource();
+}
+
+/** Lock-screen / notification controls. Actions call back into Blazor. */
+export function setMediaSession(title, artist, artworkUrl, dotNetHelper) {
+    if (!("mediaSession" in navigator)) return;
+    const artwork = artworkUrl ? [{ src: new URL(artworkUrl, document.baseURI).href }] : [];
+    navigator.mediaSession.metadata = new MediaMetadata({ title, artist, artwork });
+    const handlers = {
+        play: "MediaPlay", pause: "MediaPause", nexttrack: "MediaNext", previoustrack: "MediaPrevious"
+    };
+    for (const [action, method] of Object.entries(handlers)) {
+        try { navigator.mediaSession.setActionHandler(action, () => dotNetHelper.invokeMethodAsync(method)); } catch { /* unsupported action */ }
+    }
 }
 
 export function setVolume(value) {
@@ -252,7 +321,24 @@ function applyTunerTransform(freq) {
     tunerTrack.style.transform = `translateX(${offsetPx.toFixed(1)}px)`;
 }
 
+let embedTimer = null;
+
+export function watchEmbed(frameId, dotNetHelper, timeoutMs) {
+    clearTimeout(embedTimer);
+    // The iframe is rendered after this call; wait a tick for Blazor to put it in the DOM.
+    setTimeout(() => {
+        const frame = document.getElementById(frameId);
+        if (!frame) return;
+        let loaded = false;
+        frame.addEventListener("load", () => { loaded = true; clearTimeout(embedTimer); }, { once: true });
+        embedTimer = setTimeout(() => { if (!loaded) dotNetHelper.invokeMethodAsync("OnEmbedTimeout"); }, timeoutMs);
+    }, 50);
+}
+
 export function dispose() {
+    clearTimeout(embedTimer);
+    clearTimeout(retryTimer);
+    wantPlaying = false;
     clearSource();
     stopStatic();
     if (cleanupTunerFn) {

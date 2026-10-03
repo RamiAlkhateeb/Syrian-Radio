@@ -851,8 +851,17 @@ html, body {
     margin-top: 2px;
 }
 
+.ios-station-main {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    column-gap: 14px;
+    row-gap: 2px;
+}
+
 .ios-frequency-val {
-    font-size: clamp(3.6rem, 15vw, 4.6rem);
+    font-size: clamp(1.7rem, 7.5vw, 2.1rem);
     font-weight: 300;
     letter-spacing: -0.02em;
     color: var(--nxt-text);
@@ -860,7 +869,7 @@ html, body {
 }
 
 .ios-frequency-unit {
-    font-size: 1.35rem;
+    font-size: 1rem;
     font-weight: 600;
     color: var(--nxt-text);
     margin-left: 6px;
@@ -869,10 +878,29 @@ html, body {
 }
 
 .ios-station-title {
-    font-size: 1.45rem;
+    font-size: clamp(1.7rem, 7.5vw, 2.1rem);
     font-weight: 600;
+    line-height: 1;
     color: var(--nxt-text);
-    margin: 8px 0 6px;
+    margin: 0;
+}
+
+/* Stations shown through an embedded page: shrink the header so the card stays about the same height. */
+.ios-station-display.compact .ios-frequency-val,
+.ios-station-display.compact .ios-station-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.ios-station-display.compact .ios-frequency-unit {
+    font-size: 0.8rem;
+    margin-left: 4px;
+}
+
+.ios-station-display.compact .ios-other-stations-btn {
+    font-size: 0.9rem;
+    padding: 2px 10px;
 }
 
 .ios-station-desc {
@@ -941,6 +969,57 @@ html, body {
     position: relative;
     margin: 4px -20px;
     overflow: hidden;
+}
+
+.ios-tuner-section.is-hidden { display: none; }
+
+.ios-embed-section {
+    position: relative;
+    margin: 4px -20px;
+    background: var(--nxt-inset);
+    border-top: 1px solid var(--nxt-border);
+    border-bottom: 1px solid var(--nxt-border);
+}
+
+.ios-embed-frame {
+    display: block;
+    width: 100%;
+    height: clamp(140px, 20vh, 170px);
+    border: 0;
+    background: #fff;
+}
+
+.ios-embed-fallback {
+    position: absolute;
+    inset: 0 0 38px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: var(--nxt-inset);
+    color: var(--nxt-text-2);
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.ios-embed-fallback-logo {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: #fff;
+    padding: 4px;
+    object-fit: contain;
+}
+
+.ios-embed-open {
+    display: block;
+    padding: 10px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--brand-red-bright);
+    text-decoration: none;
 }
 
 .ios-tuner-viewport {
@@ -1406,3 +1485,32 @@ html, body {
     to { transform: translate(-50%, 0); opacity: 1; }
 }
 
+
+.ios-fav-btn {
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    line-height: 1;
+    color: var(--nxt-text-2);
+    cursor: pointer;
+    padding: 6px;
+}
+
+.ios-fav-btn.on { color: #f5a623; }
+
+.ios-sleep-btn {
+    display: block;
+    margin: 12px auto 0;
+    padding: 6px 14px;
+    border: 1px solid var(--nxt-border);
+    border-radius: 999px;
+    background: none;
+    color: var(--nxt-text-2);
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.ios-sleep-btn.on {
+    color: var(--brand-red-bright);
+    border-color: var(--brand-red-bright);
+}
