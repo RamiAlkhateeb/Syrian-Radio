@@ -5,7 +5,7 @@ The home page links to the official live-radio pages for Sham FM and Radio Damas
 
 ## Run locally
 
-Prerequisite: install the .NET 9 SDK.
+Prerequisite: install the .NET 10 SDK.
 
 ```powershell
 dotnet restore
@@ -41,3 +41,7 @@ This project includes a locked-down Cloudflare Worker in `worker/`; it relays on
    globalThis.NINAR_FM_PROXY_URL = "https://your-worker.workers.dev/";
    ```
 3. Rebuild and deploy the player. Keep `NINAR_FM_PROXY_URL` blank for local HTTP development.
+
+## Shared components
+
+Settings, the AI assistant, theme (light/dark) and the logo come from the shared `Nxt.UI` library in the `lib/Nxt.UI` git submodule (shared with Makdous and NxtTask). Clone with `git clone --recurse-submodules`, or run `git submodule update --init` after cloning.

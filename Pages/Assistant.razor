@@ -1,0 +1,65 @@
+@page "/ai"
+@using System.Text.Json.Serialization
+@inject GeminiClient Gemini
+
+<PageTitle>المساعد الذكي - راديو سوريا</PageTitle>
+
+@* The family AI assistant (Nxt.UI AiChat), same as Makdous and NxtTask: ask for a mood or a kind of
+   programme, and it picks one of the stations and tunes the player to it. *@
+<div class="nxt-page">
+    <NxtPageHeader Icon="✨" Title="المساعد الذكي" Subtitle="اطلب ما تحب سماعه وسأختار لك المحطة" BackHref="/" BackLabel="رجوع" />
+    <AiChat OnSend="HandleSendAsync"
+            EmptyText="قل لي ماذا تريد أن تسمع: أخبار، أغانٍ، برامج حوارية… وسأختار المحطة المناسبة."
+            Placeholder="مثال: بدي أسمع أغاني طربية"
+            Suggestions="@Suggestions" ShowMic="true" SpeechLanguage="ar-SA" />
+</div>
+
+@code {
+    private static readonly string[] Suggestions = ["بدي أسمع أخبار سوريا", "شغّل لي أغاني", "محطة فيها برامج حوارية"];
+
+    private async Task<AiReply> HandleSendAsync(string text)
+    {
+        var stations = string.Join("\n", RadioStations.All.Select(s =>
+            $"- id: {s.Id} | name: {s.Name} | {s.Dial} | {s.Description} | {(s.IsLiveStream ? "plays in the app" : "opens the station website")}"));
+        var prompt = $"""
+            You are the assistant inside "Syrian Radio", an app for listening to Syrian radio stations.
+            These are the only stations available:
+            {stations}
+
+            Pick the one station that best matches the listener's request, using what you know about these
+            stations' programming. Prefer stations that play in the app when the fit is similar.
+            Reply in Arabic (Syrian dialect is welcome), in one or two short friendly sentences explaining the choice.
+            If the request has nothing to do with radio, still pick the closest station and say so kindly.
+
+            Listener: {text}
+            """;
+        var schema = new
+        {
+            type = "OBJECT",
+            properties = new
+            {
+                stationId = new { type = "STRING", @enum = RadioStations.All.Select(s => s.Id).ToArray() },
+                reply = new { type = "STRING" }
+            },
+            required = new[] { "stationId", "reply" }
+        };
+
+        var pick = await Gemini.GenerateJsonAsync<StationPick>(prompt, schema, result =>
+            RadioStations.Find(result.StationId) is null ? throw new InvalidOperationException("لم أجد محطة مناسبة.") : result);
+        var station = RadioStations.Find(pick.StationId)!;
+
+        return new AiReply
+        {
+            Text = pick.Reply,
+            Sections = [new AiListSection("المحطة", [new AiListItem(station.Name, station.Dial)])],
+            ActionText = station.IsLiveStream ? $"استمع إلى {station.Name}" : $"افتح {station.Name}",
+            ActionHref = $"?station={Uri.EscapeDataString(station.Id)}"
+        };
+    }
+
+    private sealed class StationPick
+    {
+        [JsonPropertyName("stationId")] public string StationId { get; set; } = "";
+        [JsonPropertyName("reply")] public string Reply { get; set; } = "";
+    }
+}
