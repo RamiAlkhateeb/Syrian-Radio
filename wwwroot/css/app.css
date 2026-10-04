@@ -1,14 +1,16 @@
 :root {
-    --brand-red-bright: #ff2d55;
-    --brand-red-dark: #e11d48;
-    --brand-black: #1c1c1e;
-    --bg: #f7f7f9;
-    --card-bg: #ffffff;
-    --text: #1c1c1e;
-    --text-dim: #8e8e93;
-    --border: #e5e5ea;
-    --accent-rgb: 255, 45, 85;
-    --app-font: "Cairo", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    /* Colours come from the shared family tokens in Nxt.UI (nxt.css), which also
+       carry the dark theme. These aliases keep the existing selectors working. */
+    --brand-red-bright: var(--nxt-accent);
+    --brand-red-dark: var(--nxt-accent-hover);
+    --brand-black: var(--nxt-ink);
+    --bg: var(--nxt-page);
+    --card-bg: var(--nxt-card);
+    --text: var(--nxt-text);
+    --text-dim: var(--nxt-text-2);
+    --border: var(--nxt-border);
+    --accent-rgb: var(--nxt-accent-rgb);
+    --app-font: var(--nxt-font);
 }
 
 *,
@@ -19,7 +21,7 @@
 }
 
 html {
-    background-color: var(--bg, #f7f7f9);
+    background-color: var(--bg);
 }
 
 html, body {
@@ -27,7 +29,7 @@ html, body {
     min-height: 100dvh;
     margin: 0;
     font-family: var(--app-font);
-    background-color: var(--bg, #f7f7f9);
+    background-color: var(--bg);
     color: var(--text);
     touch-action: manipulation;
 }
@@ -66,18 +68,6 @@ html, body {
     margin: 0 auto;
 }
 
-.ninar-theme {
-    --brand-red-bright: #ee1c25;
-    --brand-red-dark: #7a0c12;
-    --brand-black: #111111;
-    --bg: #0b0b0d;
-    --card-bg: #1a1517;
-    --text-dim: #a89a9b;
-    --accent-rgb: 238, 28, 37;
-    background-color: var(--bg);
-    background-image: radial-gradient(circle at 30% 20%, var(--brand-red-dark) 0%, var(--bg) 55%);
-    background-attachment: fixed;
-}
 
 .directory-header {
     text-align: center;
@@ -266,7 +256,7 @@ html, body {
 
 .team-member {
     padding: 16px;
-    background: #f2f2f7;
+    background: var(--nxt-inset);
     border-radius: 14px;
     border: 1px solid var(--border);
 }
@@ -349,7 +339,7 @@ html, body {
     width: 160px;
     height: auto;
     object-fit: contain;
-    background: #ffffff;
+    background: var(--nxt-card);
     border-radius: 14px;
     padding: 14px 18px;
     margin-bottom: 16px;
@@ -518,7 +508,7 @@ html, body {
 /* Platform Switcher Tabs */
 .install-tabs {
     display: inline-flex;
-    background: #e5e5ea;
+    background: var(--nxt-border);
     padding: 4px;
     border-radius: 14px;
     gap: 4px;
@@ -542,7 +532,7 @@ html, body {
 }
 
 .install-tab-btn.active {
-    background: #ffffff;
+    background: var(--nxt-card);
     color: var(--text);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -593,7 +583,7 @@ html, body {
     position: relative;
     border-radius: 16px;
     direction: ltr;
-    background: #f2f2f7;
+    background: var(--nxt-inset);
     border: 1px solid var(--border);
 }
 
@@ -678,7 +668,7 @@ html, body {
     padding: 0;
     border: none;
     border-radius: 50%;
-    background: #d1d1d6;
+    background: var(--nxt-border);
     cursor: pointer;
     transition: background .2s ease, transform .2s ease;
 }
@@ -766,7 +756,7 @@ html, body {
 
 .ios-radio-container {
     width: min(100%, 390px);
-    background: #ffffff;
+    background: var(--nxt-card);
     border-radius: 36px;
     box-shadow: 0 16px 48px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
     padding: 24px 20px 28px;
@@ -798,14 +788,14 @@ html, body {
     gap: 6px;
     font-weight: 700;
     font-size: 0.88rem;
-    color: #8e8e93;
+    color: var(--nxt-text-2);
 }
 
 .ios-live-indicator {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #d1d1d6;
+    background: var(--nxt-border);
     transition: background 0.3s ease;
 }
 
@@ -825,8 +815,8 @@ html, body {
     font-weight: 700;
     padding: 3px 10px;
     border-radius: 12px;
-    background: #f2f2f7;
-    color: #8e8e93;
+    background: var(--nxt-inset);
+    color: var(--nxt-text-2);
 }
 
 .ios-status-pill.live {
@@ -841,8 +831,8 @@ html, body {
 }
 
 .ios-status-pill.external {
-    background: #f2f2f7;
-    color: #636366;
+    background: var(--nxt-inset);
+    color: var(--nxt-text-2);
 }
 
 /* Station Display: Frequency + Title + Other Stations */
@@ -861,33 +851,61 @@ html, body {
     margin-top: 2px;
 }
 
+.ios-station-main {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    column-gap: 14px;
+    row-gap: 2px;
+}
+
 .ios-frequency-val {
-    font-size: clamp(3.6rem, 15vw, 4.6rem);
+    font-size: clamp(1.7rem, 7.5vw, 2.1rem);
     font-weight: 300;
     letter-spacing: -0.02em;
-    color: #1c1c1e;
+    color: var(--nxt-text);
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
 }
 
 .ios-frequency-unit {
-    font-size: 1.35rem;
+    font-size: 1rem;
     font-weight: 600;
-    color: #48484a;
+    color: var(--nxt-text);
     margin-left: 6px;
     letter-spacing: 0.02em;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
 }
 
 .ios-station-title {
-    font-size: 1.45rem;
+    font-size: clamp(1.7rem, 7.5vw, 2.1rem);
     font-weight: 600;
-    color: #3a3a3c;
-    margin: 8px 0 6px;
+    line-height: 1;
+    color: var(--nxt-text);
+    margin: 0;
+}
+
+/* Stations shown through an embedded page: shrink the header so the card stays about the same height. */
+.ios-station-display.compact .ios-frequency-val,
+.ios-station-display.compact .ios-station-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.ios-station-display.compact .ios-frequency-unit {
+    font-size: 0.8rem;
+    margin-left: 4px;
+}
+
+.ios-station-display.compact .ios-other-stations-btn {
+    font-size: 0.9rem;
+    padding: 2px 10px;
 }
 
 .ios-station-desc {
     font-size: 0.95rem;
-    color: #8e8e93;
+    color: var(--nxt-text-2);
     margin: 0 0 16px 0;
     text-align: center;
 }
@@ -953,11 +971,62 @@ html, body {
     overflow: hidden;
 }
 
+.ios-tuner-section.is-hidden { display: none; }
+
+.ios-embed-section {
+    position: relative;
+    margin: 4px -20px;
+    background: var(--nxt-inset);
+    border-top: 1px solid var(--nxt-border);
+    border-bottom: 1px solid var(--nxt-border);
+}
+
+.ios-embed-frame {
+    display: block;
+    width: 100%;
+    height: clamp(140px, 20vh, 170px);
+    border: 0;
+    background: #fff;
+}
+
+.ios-embed-fallback {
+    position: absolute;
+    inset: 0 0 38px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: var(--nxt-inset);
+    color: var(--nxt-text-2);
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.ios-embed-fallback-logo {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: #fff;
+    padding: 4px;
+    object-fit: contain;
+}
+
+.ios-embed-open {
+    display: block;
+    padding: 10px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--brand-red-bright);
+    text-decoration: none;
+}
+
 .ios-tuner-viewport {
     height: 76px;
-    background: #efeff4;
-    border-top: 1px solid #dcdce0;
-    border-bottom: 1px solid #dcdce0;
+    background: var(--nxt-inset);
+    border-top: 1px solid var(--nxt-border);
+    border-bottom: 1px solid var(--nxt-border);
     position: relative;
     overflow: hidden;
     cursor: grab;
@@ -1009,12 +1078,12 @@ html, body {
 }
 
 .ios-tuner-unit.station-mark .ios-tuner-num {
-    color: #1c1c1e;
+    color: var(--nxt-text);
     font-weight: 700;
 }
 
 .ios-tuner-mark {
-    background: #8e8e93;
+    background: var(--nxt-text-2);
     border-radius: 1px;
     position: absolute;
 }
@@ -1036,7 +1105,7 @@ html, body {
     top: 0;
     width: 1px;
     height: 10px;
-    background: #c7c7cc;
+    background: var(--nxt-border);
 }
 
 .ios-tuner-num {
@@ -1045,7 +1114,7 @@ html, body {
     left: 3px;
     font-size: 11px;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", monospace;
-    color: #8e8e93;
+    color: var(--nxt-text-2);
     font-weight: 600;
     line-height: 1;
 }
@@ -1097,7 +1166,7 @@ html, body {
 .ios-step-btn {
     background: none;
     border: none;
-    color: #1c1c1e;
+    color: var(--nxt-text);
     cursor: pointer;
     width: 48px;
     height: 48px;
@@ -1121,7 +1190,7 @@ html, body {
     width: 76px;
     height: 76px;
     border-radius: 50%;
-    background: #1c1c1e;
+    background: var(--nxt-ink);
     color: #ffffff;
     border: none;
     cursor: pointer;
@@ -1154,7 +1223,7 @@ html, body {
 .ios-playback-hint {
     font-size: 0.78rem;
     font-weight: 600;
-    color: #8e8e93;
+    color: var(--nxt-text-2);
     text-align: center;
     margin-top: -6px;
     min-height: 1.25em;
@@ -1168,13 +1237,13 @@ html, body {
     gap: 12px;
     width: 88%;
     max-width: 300px;
-    color: #8e8e93;
+    color: var(--nxt-text-2);
     margin-top: 4px;
 }
 
 .ios-vol-icon {
     flex-shrink: 0;
-    color: #8e8e93;
+    color: var(--nxt-text-2);
 }
 
 .ios-volume-slider {
@@ -1183,7 +1252,7 @@ html, body {
     appearance: none;
     height: 4px;
     border-radius: 2px;
-    background: #e5e5ea;
+    background: var(--nxt-border);
     outline: none;
     cursor: pointer;
 }
@@ -1194,7 +1263,7 @@ html, body {
     width: 22px;
     height: 22px;
     border-radius: 50%;
-    background: #ffffff;
+    background: #fff;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22), 0 0 1px rgba(0, 0, 0, 0.1);
     cursor: pointer;
     transition: transform 0.1s ease;
@@ -1208,7 +1277,7 @@ html, body {
     width: 22px;
     height: 22px;
     border-radius: 50%;
-    background: #ffffff;
+    background: #fff;
     border: none;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
     cursor: pointer;
@@ -1229,7 +1298,7 @@ html, body {
 
 .ios-stations-sheet {
     width: min(100%, 460px);
-    background: #ffffff;
+    background: var(--nxt-card);
     border-radius: 28px 28px 0 0;
     padding: 12px 20px 32px;
     box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15);
@@ -1242,7 +1311,7 @@ html, body {
     width: 36px;
     height: 5px;
     border-radius: 3px;
-    background: #d1d1d6;
+    background: var(--nxt-border);
     margin: 4px auto 14px;
 }
 
@@ -1264,9 +1333,9 @@ html, body {
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    background: #f2f2f7;
+    background: var(--nxt-inset);
     border: none;
-    color: #8e8e93;
+    color: var(--nxt-text-2);
     font-size: 13px;
     cursor: pointer;
     display: flex;
@@ -1277,7 +1346,7 @@ html, body {
 }
 
 .ios-sheet-close:hover {
-    background: #e5e5ea;
+    background: var(--nxt-border);
 }
 
 .ios-stations-list {
@@ -1292,14 +1361,14 @@ html, body {
     gap: 14px;
     padding: 12px 14px;
     border-radius: 16px;
-    background: #f8f9fa;
+    background: var(--nxt-inset);
     border: 1px solid var(--border);
     cursor: pointer;
     transition: all 0.18s ease;
 }
 
 .ios-station-item:hover {
-    background: #f2f2f7;
+    background: var(--nxt-inset);
     border-color: rgba(var(--accent-rgb), 0.3);
 }
 
@@ -1313,7 +1382,7 @@ html, body {
     height: 46px;
     border-radius: 12px;
     object-fit: contain;
-    background: #ffffff;
+    background: var(--nxt-card);
     padding: 4px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
     flex-shrink: 0;
@@ -1333,7 +1402,7 @@ html, body {
 .ios-station-item-name {
     font-size: 1.05rem;
     font-weight: 700;
-    color: #1c1c1e;
+    color: var(--nxt-text);
 }
 
 .ios-station-item-badge {
@@ -1341,13 +1410,13 @@ html, body {
     font-weight: 700;
     padding: 1px 6px;
     border-radius: 6px;
-    background: #e5e5ea;
-    color: #636366;
+    background: var(--nxt-border);
+    color: var(--nxt-text-2);
 }
 
 .ios-station-item-desc {
     font-size: 0.8rem;
-    color: #8e8e93;
+    color: var(--nxt-text-2);
     display: block;
     margin-top: 2px;
 }
@@ -1367,8 +1436,8 @@ html, body {
 }
 
 .ios-item-btn.external {
-    background: #e5e5ea;
-    color: #1c1c1e;
+    background: var(--nxt-border);
+    color: var(--nxt-text);
 }
 
 /* Toast Notification */
@@ -1378,7 +1447,7 @@ html, body {
     left: 50%;
     transform: translateX(-50%);
     z-index: 150;
-    background: #1c1c1e;
+    background: var(--nxt-ink);
     color: #ffffff;
     padding: 10px 18px;
     border-radius: 30px;
@@ -1416,3 +1485,32 @@ html, body {
     to { transform: translate(-50%, 0); opacity: 1; }
 }
 
+
+.ios-fav-btn {
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    line-height: 1;
+    color: var(--nxt-text-2);
+    cursor: pointer;
+    padding: 6px;
+}
+
+.ios-fav-btn.on { color: #f5a623; }
+
+.ios-sleep-btn {
+    display: block;
+    margin: 12px auto 0;
+    padding: 6px 14px;
+    border: 1px solid var(--nxt-border);
+    border-radius: 999px;
+    background: none;
+    color: var(--nxt-text-2);
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.ios-sleep-btn.on {
+    color: var(--brand-red-bright);
+    border-color: var(--brand-red-bright);
+}

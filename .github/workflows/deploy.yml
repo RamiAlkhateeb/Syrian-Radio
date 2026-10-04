@@ -18,14 +18,20 @@ jobs:
     steps:
       - name: Check out source
         uses: actions/checkout@v6
+        with:
+          submodules: recursive
 
       - name: Set up .NET
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: "9.0.x"
+          dotnet-version: '10.0.x'
 
       - name: Restore dependencies
         run: dotnet restore NinarFmPlayer.csproj
+
+      - name: Stamp version manifest
+        # Nxt.UI's update banner compares this with the version the browser last ran.
+        run: printf '{"version":"%s"}\n' "${{ github.sha }}" > wwwroot/version.json
 
       - name: Publish Blazor WebAssembly app
         run: dotnet publish NinarFmPlayer.csproj -c Release --no-restore -o publish

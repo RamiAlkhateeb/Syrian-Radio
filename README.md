@@ -1,11 +1,11 @@
 # Syrian Radio Player
 
-A Blazor WebAssembly directory and live player for Ninar FM.
-The home page links to the official live-radio pages for Sham FM and Radio Damascus.
+A Blazor WebAssembly radio for Syrian stations: Ninar FM, Sham FM, Radio Damascus, Rozana FM and Radio Syria.
+It has an FM-style tuner, live playback, favorites, a sleep timer, lock-screen controls and an AI assistant that picks a station or suggests a song.
 
 ## Run locally
 
-Prerequisite: install the .NET 9 SDK.
+Prerequisite: install the .NET 10 SDK.
 
 ```powershell
 dotnet restore
@@ -16,28 +16,17 @@ Open the `https://localhost:<port>` address printed by the command. Stop the ser
 
 ## Project structure
 
-- `Pages/Index.razor`: three-station home page.
-- `Pages/NinarFm.razor`: Ninar FM player page.
-- `Shared/RadioPlayer.razor`: player UI and Blazor JavaScript interop.
-- `wwwroot/js/radioPlayer.js`: native audio control and status events.
+- `Pages/Index.razor`: the radio (tuner, player, station sheet, favorites, sleep timer, embedded station pages).
+- `Pages/Assistant.razor`: AI assistant (station picks, news pointers, song suggestions with YouTube links).
+- `Shared/RadioStations.cs`: the station list shared by the player and the assistant.
+- `wwwroot/js/radioPlayer.js`: native audio (incl. HLS via hls.js), auto-reconnect, Media Session, tuner.
 - `wwwroot/css/app.css`: visual styling.
+- `lib/Nxt.UI`: shared UI library (git submodule).
 
 ## Stream sources
 
-Ninar FM's origin is HTTP-only. It works when the player is served locally over HTTP. An HTTPS site must use an HTTPS proxy because browsers block HTTP audio as mixed content. The included Cloudflare Worker is used only for Ninar FM.
-
-Sham FM and Radio Damascus open their respective official live-radio websites from the station directory.
-
-This project includes a locked-down Cloudflare Worker in `worker/`; it relays only the Ninar FM stream and supports streaming response bodies and range requests. Do not use a public generic proxy for production.
-
-1. Install Node.js, then run these commands from the project root:
-   ```powershell
-   cd worker
-   npx wrangler login
-   npx wrangler deploy
-   ```
-2. Copy the emitted `https://...workers.dev` URL into `wwwroot/config.js`:
-   ```js
-   globalThis.NINAR_FM_PROXY_URL = "https://your-worker.workers.dev/";
-   ```
-3. Rebuild and deploy the player. Keep `NINAR_FM_PROXY_URL` blank for local HTTP development.
+- Ninar FM's origin is HTTP-only, so HTTPS deployments play it through the Cloudflare Worker in `worker/`.
+- Rozana FM (radio.co) and Sham FM (Shoutcast over HTTPS) play directly.
+- Radio Damascus is an HLS stream (`.m3u8`); browsers without native HLS load hls.js from jsDelivr on demand.
+- If a native stream keeps failing, stations with an `EmbedUrl` show their own website inside the app instead.
+- Radio Syria (syria.tv) has no usable stream or embeddable page, so it opens the official site.

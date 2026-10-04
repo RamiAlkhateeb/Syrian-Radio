@@ -1,6 +1,7 @@
 @page "/"
 @implements IAsyncDisposable
 @inject IJSRuntime JS
+@inject LocalStore Store
 
 <PageTitle>راديو سوريا - البث المباشر</PageTitle>
 
@@ -23,13 +24,15 @@
         </header>
 
         <!-- Main Display: Frequency + Station Name -->
-        <section class="ios-station-display">
-            <div class="ios-frequency-wrap" dir="ltr">
-                <span class="ios-frequency-val">@DisplayFrequency</span>
-                <span class="ios-frequency-unit">@DisplayUnit</span>
-            </div>
+        <section class="ios-station-display @(ShowEmbed ? "compact" : "")">
+            <div class="ios-station-main">
+                <div class="ios-frequency-wrap" dir="ltr">
+                    <span class="ios-frequency-val">@DisplayFrequency</span>
+                    <span class="ios-frequency-unit">@DisplayUnit</span>
+                </div>
 
-            <h1 class="ios-station-title">@DisplayName</h1>
+                <h1 class="ios-station-title">@DisplayName</h1>
+            </div>
 
             <button type="button" class="ios-other-stations-btn" @onclick="ToggleStationsSheet">
                 محطات أخرى
@@ -38,11 +41,10 @@
 
         <!-- Middle Action Bar: [...], [Stations List], [Share] -->
         <nav class="ios-toolbar" aria-label="أدوات الراديو">
-            <a href="/about" class="ios-tool-btn" title="عن التطبيق" aria-label="عن التطبيق">
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-                    <circle cx="5" cy="12" r="2" />
-                    <circle cx="12" cy="12" r="2" />
-                    <circle cx="19" cy="12" r="2" />
+            <a href="settings" class="ios-tool-btn" title="الإعدادات" aria-label="الإعدادات">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="3" />
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
                 </svg>
             </a>
 
@@ -56,6 +58,12 @@
                     <polygon points="5,16 5.9,18.2 8.3,18.2 6.4,19.6 7.1,21.8 5.2,20.4 3.3,21.8 4,19.6 2.1,18.2 4.5,18.2" fill="currentColor" stroke="none" />
                 </svg>
             </button>
+
+            <a href="ai" class="ios-tool-btn ios-tool-ai" title="المساعد الذكي" aria-label="المساعد الذكي">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">
+                    <path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z" />
+                </svg>
+            </a>
 
             <button type="button" class="ios-tool-btn" @onclick="OnShareClicked" title="مشاركة التطبيق" aria-label="مشاركة التطبيق">
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -78,7 +86,7 @@
         </nav>
 
         <!-- FM Frequency Tuner Scale -->
-        <section class="ios-tuner-section">
+        <section class="ios-tuner-section @(ShowEmbed ? "is-hidden" : "")">
             <div id="tuner-viewport" class="ios-tuner-viewport">
                 <!-- Center Red Needle Indicator -->
                 <div class="ios-tuner-needle" aria-hidden="true"></div>
@@ -119,6 +127,24 @@
                    aria-label="ضبط التردد"
                    @oninput="OnSliderInput" />
         </section>
+
+        @if (ShowEmbed)
+        {
+            <!-- External station: its own page sits where the tuner roller is -->
+            <section class="ios-embed-section" aria-label="موقع @CurrentStation!.Name">
+                <iframe @key="CurrentStation.Id" id="@embedFrameId" class="ios-embed-frame" src="@CurrentStation.EmbedUrl" title="@CurrentStation.Name"
+                        loading="lazy" referrerpolicy="no-referrer"
+                        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"></iframe>
+                @if (embedFailed)
+                {
+                    <div class="ios-embed-fallback">
+                        <img src="@CurrentStation.Logo" alt="" class="ios-embed-fallback-logo" />
+                        <p>تعذّر عرض موقع @CurrentStation.Name هنا.</p>
+                    </div>
+                }
+                <a class="ios-embed-open" href="@CurrentStation.Href" target="_blank" rel="noopener noreferrer">فتح الموقع في صفحة جديدة ↗</a>
+            </section>
+        }
 
         <!-- Audio Player Controls -->
         <section class="ios-controls-section">
@@ -188,7 +214,7 @@
                     }
                     else
                     {
-                        @($"اضغط للفتح على الموقع الرسمي لـ {CurrentStation.Name}")
+                        @(CurrentStation.EmbedUrl is null ? $"اضغط للفتح على الموقع الرسمي لـ {CurrentStation.Name}" : $"استمع من صفحة {CurrentStation.Name} أعلاه")
                     }
                 }
                 else
@@ -217,6 +243,10 @@
                     <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
                 </svg>
             </div>
+
+            <button type="button" class="ios-sleep-btn @(sleepMinutes > 0 ? "on" : "")" @onclick="CycleSleepTimer">
+                @(sleepMinutes > 0 ? $"مؤقت النوم: {sleepMinutes} دقيقة" : "مؤقت النوم")
+            </button>
         </section>
     </div>
 
@@ -238,7 +268,7 @@
             </header>
 
             <div class="ios-stations-list">
-                @for (int i = 0; i < Stations.Count; i++)
+                @foreach (var i in SheetOrder)
                 {
                     var idx = i;
                     var st = Stations[idx];
@@ -253,6 +283,10 @@
                             </div>
                             <span class="ios-station-item-desc">@st.Description</span>
                         </div>
+                        <button type="button" class="ios-fav-btn @(favorites.Contains(st.Id) ? "on" : "")" @onclick="() => ToggleFavorite(st.Id)" @onclick:stopPropagation
+                                aria-label="@(favorites.Contains(st.Id) ? "إزالة من المفضلة" : "إضافة إلى المفضلة")" aria-pressed="@favorites.Contains(st.Id)">
+                            @(favorites.Contains(st.Id) ? "★" : "☆")
+                        </button>
                         <div class="ios-station-item-action">
                             @if (st.IsLiveStream)
                             {
@@ -299,102 +333,26 @@
 }
 
 @code {
-    private sealed record Station(
-        string Id,
-        string Name,
-        string ShortLabel,
-        string DialFrequency,
-        string DialUnit,
-        string Dial,
-        double Frequency,
-        string Description,
-        string Logo,
-        string Href,
-        string StreamUrl,
-        bool UseProxy,
-        bool IsLiveStream);
+    private static IReadOnlyList<RadioStation> Stations => RadioStations.All;
+    private const string VolumeKey = "nxt.radio.volume";
 
-    private List<Station> Stations { get; } =
-    [
-        new Station(
-            "ninar",
-            "نينار FM",
-            "نينار",
-            "89,6",
-            "FM",
-            "89.6 FM",
-            89.6,
-            "البث المباشر من سوريا",
-            "img/ninar-logo.png",
-            "",
-            "http://ninarfm.grtvstream.com:8896/",
-            true,
-            true),
+    /// <summary>Set by the AI assistant ("/?station=rozana"): tune to that station on load.</summary>
+    [SupplyParameterFromQuery(Name = "station")] public string? StationId { get; set; }
 
-        new Station(
-            "sham",
-            "شام FM",
-            "شام",
-            "92,3",
-            "FM",
-            "92.3 FM",
-            92.3,
-            "أغانٍ وأخبار من دمشق",
-            "img/sham-fm-logo.png",
-            "http://radio.sham.fm/",
-            "",
-            false,
-            false),
-
-        new Station(
-            "damascus",
-            "إذاعة دمشق",
-            "دمشق",
-            "95,0",
-            "FM",
-            "95.0 FM",
-            95.0,
-            "البث الرسمي من دمشق",
-            "img/radio-damascus-logo.svg",
-            "https://damasradio.fm/",
-            "",
-            false,
-            false),
-
-        new Station(
-            "syria-tv",
-            "راديو سوريا",
-            "سوريا",
-            "102,0",
-            "FM",
-            "102.0 FM",
-            102.0,
-            "البث المباشر لقناة سوريا",
-            "img/syria-tv.png",
-            "https://www.syria.tv/%D8%B1%D8%A7%D8%AF%D9%8A%D9%88-%D8%B3%D9%88%D8%B1%D9%8A%D8%A7",
-            "",
-            false,
-            false),
-
-        new Station(
-            "rozana",
-            "روزنة FM",
-            "روزنة",
-            "98,0",
-            "FM",
-            "98.0 FM",
-            98.0,
-            "البث المباشر من روزنة",
-            "img/rozana-fm-logo.svg",
-            "https://www.rozana.fm/",
-            "https://stream.radio.co/sea7ed1c60/listen",
-            false,
-            true)
-    ];
+    private bool ShowEmbed => CurrentStation is { EmbedUrl: not null } st && (!st.IsLiveStream || nativeFailed.Contains(st.Id));
+    private readonly HashSet<string> nativeFailed = [];
+    private const string StationKey = "nxt.radio.station";
+    private const string FavoritesKey = "nxt.radio.favorites";
+    private HashSet<string> favorites = [];
+    private int sleepMinutes;
+    private System.Threading.Timer? sleepTimer;
+    private IEnumerable<int> SheetOrder => Enumerable.Range(0, Stations.Count).OrderBy(i => favorites.Contains(Stations[i].Id) ? 0 : 1);
+    private readonly string embedFrameId = "syrian-radio-embed";
+    private bool embedFailed;
 
     private double currentFrequency = 89.6;
     private int? currentIndex = 0;
-    private Station? CurrentStation => currentIndex.HasValue ? Stations[currentIndex.Value] : null;
+    private RadioStation? CurrentStation => currentIndex.HasValue ? Stations[currentIndex.Value] : null;
 
     private string DisplayName => CurrentStation?.Name ?? "تشويش";
     private string DisplayFrequency => CurrentStation?.DialFrequency ?? currentFrequency.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture).Replace('.', ',');
@@ -434,12 +392,19 @@
 
         try
         {
+            if (int.TryParse(await Store.GetAsync(VolumeKey), out var savedVolume)) volume = Math.Clamp(savedVolume, 0, 100);
             playerModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/radioPlayer.js");
             dotNetRef = DotNetObjectReference.Create(this);
             await playerModule.InvokeVoidAsync("init", audioElementId, dotNetRef);
             await playerModule.InvokeVoidAsync("initTuner", "tuner-viewport", "tuner-track", dotNetRef, BaseMhz, 106.0, PxPerMhz);
             await playerModule.InvokeVoidAsync("setVolume", volume / 100.0);
             await playerModule.InvokeVoidAsync("updateTunerPosition", currentFrequency);
+            favorites = (await Store.GetAsync(FavoritesKey) ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries).ToHashSet();
+            var requested = RadioStations.Find(StationId) ?? RadioStations.Find(await Store.GetAsync(StationKey));
+            if (requested is not null && requested != CurrentStation)
+                await ChangeFrequencyAndStation(requested.Frequency, updateTunerJs: true);
+            else
+                StateHasChanged();
         }
         catch (Exception ex)
         {
@@ -476,6 +441,7 @@
             if (currentIndex.HasValue)
             {
                 var st = Stations[currentIndex.Value];
+                nativeFailed.Remove(st.Id);
                 SetStatus("buffering", "جارٍ الاتصال...");
                 await playerModule.InvokeVoidAsync("play", st.StreamUrl, st.UseProxy);
             }
@@ -500,7 +466,20 @@
         {
             volume = v;
             await playerModule.InvokeVoidAsync("setVolume", volume / 100.0);
+            await Store.SetAsync(VolumeKey, volume.ToString());
         }
+    }
+
+    [JSInvokable] public Task MediaPlay() => InvokeAsync(async () => { if (!isPlaying) await TogglePlay(); StateHasChanged(); });
+    [JSInvokable] public Task MediaPause() => InvokeAsync(async () => { if (isPlaying) await TogglePlay(); StateHasChanged(); });
+    [JSInvokable] public Task MediaNext() => InvokeAsync(NextStation);
+    [JSInvokable] public Task MediaPrevious() => InvokeAsync(PrevStation);
+
+    [JSInvokable]
+    public void OnEmbedTimeout()
+    {
+        embedFailed = true;
+        StateHasChanged();
     }
 
     [JSInvokable]
@@ -522,6 +501,11 @@
             case "error":
                 isPlaying = false;
                 SetStatus("error", "انقطع البث");
+                if (CurrentStation is { EmbedUrl: not null } failed && nativeFailed.Add(failed.Id))
+                {
+                    embedFailed = false;
+                    _ = playerModule?.InvokeVoidAsync("watchEmbed", embedFrameId, dotNetRef, 8000).AsTask();
+                }
                 break;
         }
         StateHasChanged();
@@ -626,6 +610,17 @@
     {
         if (playerModule is null) return;
 
+        embedFailed = false;
+        if (CurrentStation is { } now)
+        {
+            _ = Store.SetAsync(StationKey, now.Id);
+            try { await playerModule.InvokeVoidAsync("setMediaSession", now.Name, "راديو سوريا", now.Logo, dotNetRef); } catch { }
+        }
+        if (ShowEmbed)
+        {
+            try { await playerModule.InvokeVoidAsync("watchEmbed", embedFrameId, dotNetRef, 8000); } catch { }
+        }
+
         if (currentIndex.HasValue)
         {
             var st = Stations[currentIndex.Value];
@@ -664,6 +659,26 @@
                 await playerModule.InvokeVoidAsync("stopStatic");
             }
         }
+    }
+
+    private async Task ToggleFavorite(string id)
+    {
+        if (!favorites.Remove(id)) favorites.Add(id);
+        await Store.SetAsync(FavoritesKey, string.Join(',', favorites));
+    }
+
+    private void CycleSleepTimer()
+    {
+        sleepMinutes = sleepMinutes switch { 0 => 15, 15 => 30, 30 => 60, _ => 0 };
+        sleepTimer?.Dispose();
+        sleepTimer = null;
+        if (sleepMinutes == 0) return;
+        sleepTimer = new System.Threading.Timer(_ => InvokeAsync(async () =>
+        {
+            sleepMinutes = 0;
+            if (isPlaying) await TogglePlay();
+            StateHasChanged();
+        }), null, TimeSpan.FromMinutes(sleepMinutes), System.Threading.Timeout.InfiniteTimeSpan);
     }
 
     private void ToggleStationsSheet()
@@ -724,6 +739,7 @@
     public async ValueTask DisposeAsync()
     {
         toastTimer?.Dispose();
+        sleepTimer?.Dispose();
 
         if (playerModule is not null)
         {

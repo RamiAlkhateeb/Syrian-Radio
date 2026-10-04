@@ -1,24 +1,7 @@
 @page "/about"
+@inject NavigationManager Nav
 
-<PageTitle>عن راديو سوريا</PageTitle>
-
-<main class="about-page" lang="ar" dir="rtl">
-    <a class="back-link" href="/">الرئيسية ←</a>
-
-    <section class="about-card">
-        <img class="about-logo" src="img/logo.png" alt="شعار راديو سوريا" />
-        <h1>عن راديو سوريا</h1>
-        <p>راديو سوريا هو دليل بسيط للاستماع إلى محطات الراديو السورية من مكان واحد.</p>
-
-        <h2>فريق التطوير</h2>
-        <article class="team-member">
-            <h3>رامي الخطيب</h3>
-            <p>تطوير التطبيق</p>
-            <a class="team-member-link" href="https://ramialkhateeb.github.io/" target="_blank" rel="noopener noreferrer">الموقع الشخصي</a>
-        </article>
-
-        <div style="margin-top: 24px;">
-            <a class="about-link" href="/install" style="color: var(--brand-red-bright);">📲 طريقة تثبيت التطبيق على هاتفك ←</a>
-        </div>
-    </section>
-</main>
+@* About now lives on the settings page, as in the other family apps. Kept so old links still work. *@
+@code {
+    protected override void OnInitialized() => Nav.NavigateTo("settings", replace: true);
+}

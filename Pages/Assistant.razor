@@ -1,0 +1,64 @@
+@page "/ai"
+@using System.Text.Json.Serialization
+@inject GeminiClient Gemini
+
+<PageTitle>المساعد الذكي - راديو سوريا</PageTitle>
+
+@* The family AI assistant (Nxt.UI AiChat), same as Makdous and NxtTask: ask for a mood or a kind of
+   song, and it suggests an Arabic song with a YouTube link. *@
+<div class="nxt-page">
+    <NxtPageHeader Icon="✨" Title="المساعد الذكي" Subtitle="اطلب أغنية وسأقترح لك واحدة مع رابط يوتيوب" BackHref="/" BackLabel="رجوع" />
+    <AiChat OnSend="HandleSendAsync"
+            EmptyText="قل لي نوع الأغنية أو مزاجك، وسأقترح لك أغنية عربية مع رابط يوتيوب."
+            Placeholder="مثال: أغنية طربية قديمة"
+            Suggestions="@Suggestions" ShowMic="true" SpeechLanguage="ar-SA" />
+</div>
+
+@code {
+    private static readonly string[] Suggestions = ["اقترح لي أغنية عربية عشوائية", "أغنية سورية قديمة", "أغنية طربية", "أغنية رومانسية"];
+
+    private async Task<AiReply> HandleSendAsync(string text)
+    {
+        var prompt = $"""
+            You are the assistant inside "Syrian Radio". You only suggest songs.
+            Pick ONE real, well-known Arabic song that fits the listener's request (Syrian or classic Arabic favourites are
+            welcome). If the request is vague or says "random", vary your pick and do not always give the same song.
+            Give the exact songTitle and songArtist in Arabic script, and reply in Arabic (Syrian dialect is welcome)
+            in one or two short friendly sentences. If the request is not about music, still suggest a song and say so kindly.
+
+            Listener: {text}
+            """;
+        var schema = new
+        {
+            type = "OBJECT",
+            properties = new
+            {
+                reply = new { type = "STRING" },
+                songTitle = new { type = "STRING" },
+                songArtist = new { type = "STRING" }
+            },
+            required = new[] { "reply", "songTitle", "songArtist" }
+        };
+
+        var pick = await Gemini.GenerateJsonAsync<SongPick>(prompt, schema, result =>
+            string.IsNullOrWhiteSpace(result.SongTitle) ? throw new InvalidOperationException("لم أجد أغنية مناسبة.") : result);
+
+        // A search link always resolves; model-written video ids are often wrong or dead.
+        var query = Uri.EscapeDataString($"{pick.SongArtist} {pick.SongTitle}".Trim());
+        return new AiReply
+        {
+            Text = pick.Reply,
+            Sections = [new AiListSection("الأغنية", [new AiListItem(pick.SongTitle, string.IsNullOrWhiteSpace(pick.SongArtist) ? null : pick.SongArtist)])],
+            ActionText = "استمع على يوتيوب ↗",
+            ActionHref = $"https://www.youtube.com/results?search_query={query}",
+            ActionNewTab = true
+        };
+    }
+
+    private sealed class SongPick
+    {
+        [JsonPropertyName("reply")] public string Reply { get; set; } = "";
+        [JsonPropertyName("songTitle")] public string SongTitle { get; set; } = "";
+        [JsonPropertyName("songArtist")] public string? SongArtist { get; set; }
+    }
+}
