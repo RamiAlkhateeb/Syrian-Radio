@@ -1,7 +1,7 @@
 # Syrian Radio Player
 
 A Blazor WebAssembly radio for Syrian stations: Ninar FM, Sham FM, Radio Damascus, Rozana FM and Radio Syria.
-It has an FM-style tuner, live playback, favorites, a sleep timer, lock-screen controls and an AI assistant that picks a station or suggests a song.
+It has an FM-style tuner, live playback, favorites, a sleep timer, lock-screen controls and an AI assistant that chats about what you feel like hearing, offers a few songs to pick from, and links your pick on YouTube.
 
 ## Run locally
 
@@ -17,7 +17,7 @@ Open the `https://localhost:<port>` address printed by the command. Stop the ser
 ## Project structure
 
 - `Pages/Index.razor`: the radio (tuner, player, station sheet, favorites, sleep timer, embedded station pages).
-- `Pages/Assistant.razor`: AI assistant (station picks, news pointers, song suggestions with YouTube links).
+- `Pages/Assistant.razor`: AI song assistant (up to two short questions, then a list of songs to tap, then a YouTube link for the chosen one).
 - `Shared/RadioStations.cs`: the station list shared by the player and the assistant.
 - `wwwroot/js/radioPlayer.js`: native audio (incl. HLS via hls.js), auto-reconnect, Media Session, tuner.
 - `wwwroot/css/app.css`: visual styling.

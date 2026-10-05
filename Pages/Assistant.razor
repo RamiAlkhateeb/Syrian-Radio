@@ -1,64 +1,212 @@
 @page "/ai"
+@using System.Text
 @using System.Text.Json.Serialization
 @inject GeminiClient Gemini
 
 <PageTitle>المساعد الذكي - راديو سوريا</PageTitle>
 
-@* The family AI assistant (Nxt.UI AiChat), same as Makdous and NxtTask: ask for a mood or a kind of
-   song, and it suggests an Arabic song with a YouTube link. *@
+@* The family AI assistant (Nxt.UI AiChat). It chats briefly about what the listener wants, offers a short list of
+   Arabic songs to pick from, and only then gives a YouTube link for the chosen song. *@
 <div class="nxt-page">
-    <NxtPageHeader Icon="✨" Title="المساعد الذكي" Subtitle="اطلب أغنية وسأقترح لك واحدة مع رابط يوتيوب" BackHref="/" BackLabel="رجوع" />
+    <NxtPageHeader Icon="✨" Title="المساعد الذكي" Subtitle="خلينا نحكي شوي، وبعدين اختار أغنيتك من القائمة" BackHref="/" BackLabel="رجوع" />
     <AiChat OnSend="HandleSendAsync"
-            EmptyText="قل لي نوع الأغنية أو مزاجك، وسأقترح لك أغنية عربية مع رابط يوتيوب."
-            Placeholder="مثال: أغنية طربية قديمة"
+            EmptyText="احكيلي شو جوّك أو شو بتحب تسمع، رح إسألك سؤال أو اتنين وبعدين إعطيك كم أغنية تختار منها."
+            Placeholder="مثال: بدي شي طربي قديم"
             Suggestions="@Suggestions" ShowMic="true" SpeechLanguage="ar-SA" />
 </div>
 
 @code {
-    private static readonly string[] Suggestions = ["اقترح لي أغنية عربية عشوائية", "أغنية سورية قديمة", "أغنية طربية", "أغنية رومانسية"];
+    private const int MaxQuestions = 2;
+    private const int MaxTranscriptTurns = 12;
+    private const string SuggestNow = "اقترح مباشرة";
+    private const string MoreOptions = "اقترح غيرها";
+
+    private static readonly string[] Suggestions = ["مش عارف شو بدي، ساعدني", "أغنية سورية قديمة", "شي طربي", "أغنية رومانسية"];
+    private static readonly string[] AfterSongChoices = ["أغنية تانية بنفس الجو", "شي مختلف"];
+
+    private readonly List<string> transcript = [];
+    private readonly List<SongOption> offered = [];
+    private List<SongOption> lastOptions = [];
+    private int questionsAsked;
 
     private async Task<AiReply> HandleSendAsync(string text)
     {
-        var prompt = $"""
-            You are the assistant inside "Syrian Radio". You only suggest songs.
-            Pick ONE real, well-known Arabic song that fits the listener's request (Syrian or classic Arabic favourites are
-            welcome). If the request is vague or says "random", vary your pick and do not always give the same song.
-            Give the exact songTitle and songArtist in Arabic script, and reply in Arabic (Syrian dialect is welcome)
-            in one or two short friendly sentences. If the request is not about music, still suggest a song and say so kindly.
+        var picked = ResolvePick(text);
+        transcript.Add($"Listener: {text}");
 
-            Listener: {text}
-            """;
-        var schema = new
-        {
-            type = "OBJECT",
-            properties = new
-            {
-                reply = new { type = "STRING" },
-                songTitle = new { type = "STRING" },
-                songArtist = new { type = "STRING" }
-            },
-            required = new[] { "reply", "songTitle", "songArtist" }
-        };
+        if (picked is not null)
+            return SongReply(picked, $"اختيار حلو! 🎶 «{picked.Title}» لـ{picked.Artist}، استمتع فيها.");
 
-        var pick = await Gemini.GenerateJsonAsync<SongPick>(prompt, schema, result =>
-            string.IsNullOrWhiteSpace(result.SongTitle) ? throw new InvalidOperationException("لم أجد أغنية مناسبة.") : result);
+        var turn = await Gemini.GenerateJsonAsync<AssistantTurn>(BuildPrompt(), Schema, Validate);
 
-        // A search link always resolves; model-written video ids are often wrong or dead.
-        var query = Uri.EscapeDataString($"{pick.SongArtist} {pick.SongTitle}".Trim());
+        if (turn.Stage == "song")
+            return SongReply(new SongOption(turn.SongTitle.Trim(), turn.SongArtist?.Trim() ?? ""), turn.Reply);
+        if (turn.Stage == "ask" || turn.Options is not { Count: > 0 })
+            return AskReply(turn);
+        return OptionsReply(turn);
+    }
+
+    private AiReply AskReply(AssistantTurn turn)
+    {
+        questionsAsked++;
+        transcript.Add($"Assistant (question): {turn.Reply}");
+        var chips = (turn.QuickReplies ?? []).Where(q => !string.IsNullOrWhiteSpace(q)).Take(4).Append(SuggestNow).ToList();
+        return new AiReply { Text = turn.Reply, Choices = chips };
+    }
+
+    private AiReply OptionsReply(AssistantTurn turn)
+    {
+        lastOptions = turn.Options!
+            .Where(o => !string.IsNullOrWhiteSpace(o.Title))
+            .Select(o => new SongOption(o.Title.Trim(), o.Artist?.Trim() ?? ""))
+            .Take(5)
+            .ToList();
+        offered.AddRange(lastOptions);
+
+        var listed = string.Join("; ", lastOptions.Select((o, i) => $"{i + 1}) {o.Label}"));
+        transcript.Add($"Assistant (options): {turn.Reply}\nOffered: {listed}");
+
         return new AiReply
         {
-            Text = pick.Reply,
-            Sections = [new AiListSection("الأغنية", [new AiListItem(pick.SongTitle, string.IsNullOrWhiteSpace(pick.SongArtist) ? null : pick.SongArtist)])],
-            ActionText = "استمع على يوتيوب ↗",
-            ActionHref = $"https://www.youtube.com/results?search_query={query}",
-            ActionNewTab = true
+            Text = turn.Reply,
+            Sections = [new AiListSection("اختر أغنية", lastOptions.Select((o, i) => new AiListItem(o.Label, $"{i + 1}.")).ToList())],
+            Choices = lastOptions.Select(o => o.Label).Append(MoreOptions).ToList()
         };
     }
 
-    private sealed class SongPick
+    private AiReply SongReply(SongOption song, string text)
+    {
+        transcript.Add($"Assistant (song link given): {song.Label}");
+        questionsAsked = 0;
+        lastOptions = [];
+
+        // A search link always resolves; model-written video ids are often wrong or dead.
+        var query = Uri.EscapeDataString($"{song.Artist} {song.Title}".Trim());
+        return new AiReply
+        {
+            Text = text,
+            Sections = [new AiListSection("الأغنية", [new AiListItem(song.Title, string.IsNullOrWhiteSpace(song.Artist) ? null : song.Artist)])],
+            ActionText = "استمع على يوتيوب ↗",
+            ActionHref = $"https://www.youtube.com/results?search_query={query}",
+            ActionNewTab = true,
+            Choices = AfterSongChoices
+        };
+    }
+
+    // Chip taps and "2" / "٢" resolve locally, so the chosen song can't be swapped by the model.
+    private SongOption? ResolvePick(string text)
+    {
+        if (lastOptions.Count == 0) return null;
+        var input = text.Trim();
+
+        var match = lastOptions.FirstOrDefault(o => o.Label == input || o.Title == input);
+        if (match is not null) return match;
+
+        var digits = new string(input.Select(c => c switch
+        {
+            >= '٠' and <= '٩' => (char)('0' + (c - '٠')),
+            >= '۰' and <= '۹' => (char)('0' + (c - '۰')),
+            _ => c
+        }).ToArray());
+        return int.TryParse(digits, out var n) && n >= 1 && n <= lastOptions.Count ? lastOptions[n - 1] : null;
+    }
+
+    private string BuildPrompt()
+    {
+        var limitNote = questionsAsked >= MaxQuestions
+            ? "You have used all your questions: do NOT ask again, give options now."
+            : "";
+        var alreadyOffered = offered.Count == 0 ? "(none)" : string.Join("; ", offered.Select(o => o.Label).Distinct());
+        var history = string.Join("\n", transcript.TakeLast(MaxTranscriptTurns));
+
+        return $"""
+            You are the music assistant inside the "Syrian Radio" app. Through a short, friendly chat you help the listener
+            find ONE Arabic song, then the app gives them a YouTube link for it. Choose exactly one stage per reply:
+
+            - "ask": ask ONE short question to understand what they want (mood, occasion, era, a singer they like).
+              Put 2-4 short tappable answers in quickReplies (Arabic, at most 4 words each).
+              Questions asked so far in this search: {questionsAsked} of {MaxQuestions}. {limitNote}
+            - "options": offer 3-5 real, well-known Arabic songs that fit, in options (title and artist in Arabic script),
+              and invite them in one sentence to pick one. Do not list the songs inside reply.
+            - "song": only when the listener has clearly chosen one song, from your list (by number, name, or a
+              description like "the Fairuz one") or by naming it. Fill songTitle and songArtist exactly.
+
+            Rules:
+            - If the request is already specific (a singer, a style, a mood with an era), or they say they don't mind,
+              "{SuggestNow}" or similar, skip the questions and give options.
+            - If they ask for other or different songs ("{MoreOptions}", "شي مختلف"), give new options that are not in the
+              already-offered list.
+            - "أغنية تانية بنفس الجو" means new options in the same mood as the last song.
+            - If the message is not about music, answer kindly in one sentence and steer back to music with a question.
+            - Vary your picks; Syrian and classic Arabic favourites are welcome. Never invent songs.
+            - reply is in Arabic (Syrian dialect welcome), one or two short friendly sentences, with no links.
+
+            Already offered (do not offer again): {alreadyOffered}
+
+            Conversation so far:
+            {history}
+            """;
+    }
+
+    private static readonly object Schema = new
+    {
+        type = "OBJECT",
+        properties = new
+        {
+            reply = new { type = "STRING" },
+            stage = new Dictionary<string, object>
+            {
+                ["type"] = "STRING",
+                ["format"] = "enum",
+                ["enum"] = new[] { "ask", "options", "song" }
+            },
+            quickReplies = new { type = "ARRAY", items = new { type = "STRING" } },
+            options = new
+            {
+                type = "ARRAY",
+                items = new
+                {
+                    type = "OBJECT",
+                    properties = new { title = new { type = "STRING" }, artist = new { type = "STRING" } },
+                    required = new[] { "title", "artist" }
+                }
+            },
+            songTitle = new { type = "STRING" },
+            songArtist = new { type = "STRING" }
+        },
+        required = new[] { "reply", "stage" }
+    };
+
+    // Throwing InvalidOperationException makes GeminiClient retry with its next model.
+    private static AssistantTurn Validate(AssistantTurn turn)
+    {
+        if (string.IsNullOrWhiteSpace(turn.Reply))
+            throw new InvalidOperationException("لم أفهم الرد، جرّب مرة ثانية.");
+        if (turn.Stage == "song" && string.IsNullOrWhiteSpace(turn.SongTitle))
+            throw new InvalidOperationException("لم أجد أغنية مناسبة.");
+        if (turn.Stage == "options" && (turn.Options?.Count(o => !string.IsNullOrWhiteSpace(o.Title)) ?? 0) < 3)
+            throw new InvalidOperationException("لم أجد خيارات كافية.");
+        return turn;
+    }
+
+    private sealed record SongOption(string Title, string Artist)
+    {
+        public string Label => string.IsNullOrWhiteSpace(Artist) ? Title : $"{Title} – {Artist}";
+    }
+
+    private sealed class AssistantTurn
     {
         [JsonPropertyName("reply")] public string Reply { get; set; } = "";
+        [JsonPropertyName("stage")] public string Stage { get; set; } = "";
+        [JsonPropertyName("quickReplies")] public List<string>? QuickReplies { get; set; }
+        [JsonPropertyName("options")] public List<OptionDto>? Options { get; set; }
         [JsonPropertyName("songTitle")] public string SongTitle { get; set; } = "";
         [JsonPropertyName("songArtist")] public string? SongArtist { get; set; }
+    }
+
+    private sealed class OptionDto
+    {
+        [JsonPropertyName("title")] public string Title { get; set; } = "";
+        [JsonPropertyName("artist")] public string? Artist { get; set; }
     }
 }
