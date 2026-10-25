@@ -86,10 +86,14 @@
         </nav>
 
         <!-- FM Frequency Tuner Scale -->
-        <section class="ios-tuner-section @(ShowEmbed ? "is-hidden" : "")">
+        <section class="ios-tuner-section @(ShowEmbed ? "is-hidden" : "") @(IsOnAir ? "on-air" : "")">
             <div id="tuner-viewport" class="ios-tuner-viewport">
                 <!-- Center Red Needle Indicator -->
                 <div class="ios-tuner-needle" aria-hidden="true"></div>
+                @if (IsOnAir)
+                {
+                    <div class="ios-tuner-eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+                }
 
                 <!-- Tuner Scale Track -->
                 <div id="tuner-track" class="ios-tuner-track" style="transform: translateX(@(TunerOffsetStyle)px);" dir="ltr">
@@ -161,7 +165,7 @@
                 @if (IsLiveStream)
                 {
                     <button type="button"
-                            class="ios-play-btn @(isPlaying ? "playing" : "")"
+                            class="ios-play-btn @(isPlaying ? "playing" : "") @(IsOnAir ? "on-air" : "") @(IsConnecting ? "connecting" : "")"
                             @onclick="TogglePlay"
                             aria-label="@(isPlaying ? "إيقاف مؤقت" : "تشغيل")">
                         @if (isPlaying)
@@ -359,6 +363,9 @@
     private string DisplayUnit => CurrentStation?.DialUnit ?? "FM";
     private string DisplayDescription => CurrentStation?.Description ?? "ابحث عن محطة...";
     private bool IsLiveStream => CurrentStation?.IsLiveStream ?? true;
+    // statusClass follows the audio element's own events, so these track real playback, not the tap.
+    private bool IsOnAir => isPlaying && CurrentStation is { IsLiveStream: true } && statusClass == "live";
+    private bool IsConnecting => isPlaying && CurrentStation is { IsLiveStream: true } && statusClass == "buffering";
 
     // Tuner ruler offset: each 1 MHz = 70px. Scale starts at 86 MHz.
     // Scale track is centered at 50% in CSS, so offset moves frequency directly under needle

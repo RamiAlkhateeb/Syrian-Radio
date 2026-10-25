@@ -1052,6 +1052,51 @@ html, body {
     border-radius: 1px;
 }
 
+/* On air: the needle glows and a small equalizer bounces below the frequency numbers. */
+.ios-tuner-section.on-air .ios-tuner-needle {
+    animation: needleGlow 1.8s ease-in-out infinite;
+}
+
+@keyframes needleGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0); }
+    50% { box-shadow: 0 0 10px 2px rgba(var(--accent-rgb), 0.55); }
+}
+
+.ios-tuner-eq {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    height: 26px;
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    padding: 0 6px 8px;
+    z-index: 11;
+    pointer-events: none;
+    background: var(--nxt-inset);
+}
+
+.ios-tuner-eq i {
+    width: 3px;
+    height: 100%;
+    border-radius: 2px;
+    background: var(--brand-red-bright);
+    transform-origin: bottom;
+    animation: eqBounce 1s ease-in-out infinite;
+}
+
+.ios-tuner-eq i:nth-child(1) { animation-duration: 0.9s; animation-delay: -0.2s; }
+.ios-tuner-eq i:nth-child(2) { animation-duration: 1.15s; animation-delay: -0.55s; }
+.ios-tuner-eq i:nth-child(3) { animation-duration: 0.8s; animation-delay: -0.35s; }
+.ios-tuner-eq i:nth-child(4) { animation-duration: 1.05s; animation-delay: -0.75s; }
+.ios-tuner-eq i:nth-child(5) { animation-duration: 0.95s; animation-delay: -0.1s; }
+
+@keyframes eqBounce {
+    0%, 100% { transform: scaleY(0.25); }
+    50% { transform: scaleY(1); }
+}
+
 .ios-tuner-track {
     height: 100%;
     display: flex;
@@ -1217,6 +1262,70 @@ html, body {
 
 .ios-play-btn.playing {
     box-shadow: 0 0 0 6px rgba(var(--accent-rgb), 0.15), 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* On air: sound-wave rings behind the button. Connecting: a spinning arc around it. */
+.ios-play-btn.on-air,
+.ios-play-btn.connecting {
+    position: relative;
+    isolation: isolate;
+}
+
+.ios-play-btn.on-air {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.ios-play-btn.on-air::before,
+.ios-play-btn.on-air::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 3px solid rgba(var(--accent-rgb), 0.55);
+    z-index: -1;
+    pointer-events: none;
+    animation: playWave 2.4s cubic-bezier(0.2, 0.6, 0.35, 1) infinite;
+}
+
+.ios-play-btn.on-air::after {
+    animation-delay: 1.2s;
+}
+
+@keyframes playWave {
+    0% { transform: scale(1); opacity: 0.9; }
+    100% { transform: scale(1.65); opacity: 0; }
+}
+
+.ios-play-btn.connecting::after {
+    content: "";
+    position: absolute;
+    inset: -7px;
+    border-radius: 50%;
+    border: 3px solid rgba(var(--accent-rgb), 0.15);
+    border-top-color: var(--brand-red-bright);
+    pointer-events: none;
+    animation: playSpin 0.9s linear infinite;
+}
+
+@keyframes playSpin {
+    to { transform: rotate(360deg); }
+}
+
+/* Kept after all the on-air rules above so it wins at equal specificity. */
+@media (prefers-reduced-motion: reduce) {
+    .ios-play-btn.on-air::before,
+    .ios-play-btn.on-air::after,
+    .ios-play-btn.connecting::after,
+    .ios-tuner-section.on-air .ios-tuner-needle,
+    .ios-tuner-eq i {
+        animation: none;
+    }
+
+    .ios-play-btn.on-air::before { transform: scale(1.18); opacity: 0.5; }
+    .ios-play-btn.on-air::after { display: none; }
+    .ios-tuner-section.on-air .ios-tuner-needle { box-shadow: 0 0 8px 1px rgba(var(--accent-rgb), 0.45); }
+    .ios-tuner-eq i { transform: scaleY(0.6); }
+    .ios-tuner-eq i:nth-child(2n) { transform: scaleY(0.9); }
 }
 
 .ios-external-hint,
