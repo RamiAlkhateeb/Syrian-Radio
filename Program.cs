@@ -12,7 +12,7 @@ builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.H
 builder.Services.AddNxtUi(o =>
 {
     o.App = NxtAppId.Radio;
-    o.LogoUrl = "img/logo.png";
+    o.LogoUrl = "img/logo.png?v=20261025";
     o.Description = new() { ["ar"] = "دليل بسيط للاستماع إلى محطات الراديو السورية من مكان واحد." };
 });
 
