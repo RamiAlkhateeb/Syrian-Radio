@@ -165,7 +165,7 @@
                 @if (IsLiveStream)
                 {
                     <button type="button"
-                            class="ios-play-btn @(isPlaying ? "playing" : "") @(IsOnAir ? "on-air" : "") @(IsConnecting ? "connecting" : "")"
+                            class="ios-play-btn @(isPlaying ? "playing" : "")"
                             @onclick="TogglePlay"
                             aria-label="@(isPlaying ? "إيقاف مؤقت" : "تشغيل")">
                         @if (isPlaying)
@@ -363,9 +363,8 @@
     private string DisplayUnit => CurrentStation?.DialUnit ?? "FM";
     private string DisplayDescription => CurrentStation?.Description ?? "ابحث عن محطة...";
     private bool IsLiveStream => CurrentStation?.IsLiveStream ?? true;
-    // statusClass follows the audio element's own events, so these track real playback, not the tap.
+    // statusClass follows the audio element's own events, so this tracks real playback, not the tap.
     private bool IsOnAir => isPlaying && CurrentStation is { IsLiveStream: true } && statusClass == "live";
-    private bool IsConnecting => isPlaying && CurrentStation is { IsLiveStream: true } && statusClass == "buffering";
 
     // Tuner ruler offset: each 1 MHz = 70px. Scale starts at 86 MHz.
     // Scale track is centered at 50% in CSS, so offset moves frequency directly under needle

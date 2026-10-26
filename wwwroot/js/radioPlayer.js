@@ -15,7 +15,14 @@ export function init(elementId, dotNetHelper) {
 
     audioEl.addEventListener("playing", () => dotNetRef.invokeMethodAsync("OnStatusChanged", "live"));
     audioEl.addEventListener("waiting", () => dotNetRef.invokeMethodAsync("OnStatusChanged", "buffering"));
-    audioEl.addEventListener("pause", () => dotNetRef.invokeMethodAsync("OnStatusChanged", "paused"));
+    audioEl.addEventListener("pause", () => {
+        // Only a pause from outside the app (OS, headphones) counts: not a failed load, a pending retry,
+        // a stale event from before a newer play(), or our own pause() (Blazor already shows that).
+        if (audioEl.error || attemptDropped || !audioEl.paused || !wantPlaying) return;
+        wantPlaying = false;
+        clearTimeout(retryTimer);
+        notifyStatus("paused");
+    });
     audioEl.addEventListener("playing", () => { retries = 0; });
     audioEl.addEventListener("error", () => handleDrop());
     audioEl.addEventListener("stalled", () => { if (audioEl.readyState < 3) handleDrop(); });
@@ -27,10 +34,13 @@ let currentSource = null;
 let retries = 0;
 let retryTimer = null;
 let hls = null;
+// One failed load raises several signals (error event, rejected play(), stalled); count it once.
+let attemptDropped = false;
 const MAX_RETRIES = 3;
 
 function handleDrop() {
-    if (!wantPlaying || !currentSource) return;
+    if (!wantPlaying || !currentSource || attemptDropped) return;
+    attemptDropped = true;
     if (retries >= MAX_RETRIES) {
         wantPlaying = false;
         notifyStatus("error");
@@ -70,6 +80,7 @@ function clearSource() {
 function startNativePlayback(sourceUrl) {
     if (!audioEl) return;
     if (hls) { hls.destroy(); hls = null; }
+    attemptDropped = false;
 
     if (/\.m3u8(\?|$)/i.test(sourceUrl) && !audioEl.canPlayType("application/vnd.apple.mpegurl")) {
         // Chrome/Firefox/Edge have no native HLS: use hls.js.
@@ -80,14 +91,19 @@ function startNativePlayback(sourceUrl) {
             hls.on(Hls.Events.ERROR, (_, data) => { if (data.fatal) handleDrop(); });
             hls.loadSource(sourceUrl);
             hls.attachMedia(audioEl);
-            audioEl.play().catch(() => notifyStatus("error"));
+            audioEl.play().catch(dropUnlessAborted);
         }).catch(() => handleDrop());
         return;
     }
 
     audioEl.src = sourceUrl;
     audioEl.load();
-    audioEl.play().catch(() => handleDrop());
+    audioEl.play().catch(dropUnlessAborted);
+}
+
+// AbortError means a newer load/pause superseded this play(), not that the stream failed.
+function dropUnlessAborted(err) {
+    if (err?.name !== "AbortError") handleDrop();
 }
 
 export function play(streamUrl, useNinarProxy) {
